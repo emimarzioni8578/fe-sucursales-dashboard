@@ -1,0 +1,107 @@
+@if (data$ | async; as d) {
+  <h1>Calidad de Datos</h1>
+  <p class="subtitle">Evaluación de completitud y cobertura de la información de sucursales</p>
+
+  <div class="dq-row">
+    <mat-card class="dq-card bad"><mat-card-content><div class="number">{{d.sinRedSocial}}</div><div class="desc">Sucursales sin Red Social</div><div class="pct">{{d.pctSinSocial}}%</div></mat-card-content></mat-card>
+    <mat-card class="dq-card warn"><mat-card-content><div class="number">{{d.sinDistribuidor}}</div><div class="desc">Sucursales sin Distribuidor</div><div class="pct">{{d.pctSinDist}}%</div></mat-card-content></mat-card>
+    <mat-card class="dq-card good"><mat-card-content><div class="number">{{d.sinCoordenadas}}</div><div class="desc">Sucursales sin Coordenadas</div><div class="pct">{{d.pctSinCoord}}%</div></mat-card-content></mat-card>
+    <mat-card class="dq-card teal"><mat-card-content><div class="number">{{d.pctCobSocial}}%</div><div class="desc">Cobertura Social General</div></mat-card-content></mat-card>
+    <mat-card class="dq-card teal"><mat-card-content><div class="number">{{d.pctCobDist}}%</div><div class="desc">Cobertura Distribuidor General</div></mat-card-content></mat-card>
+  </div>
+
+  <div class="chart-row">
+    <mat-card class="chart-card full"><mat-card-header><mat-card-title>Cobertura Social y de Distribuidor por Provincia</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="getCoberturaData(d)" [type]="barType" [options]="barOptions"></canvas></mat-card-content></mat-card>
+  </div>
+
+  <div class="chart-row">
+    <mat-card class="chart-card full">
+      <mat-card-header>
+        <mat-card-title>Sucursales con problemas de calidad ({{ issues.data.length }})</mat-card-title>
+        <span class="head-spacer"></span>
+        <button mat-stroked-button (click)="exportarProblemas()"><mat-icon>download</mat-icon> Exportar CSV</button>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search">
+          <mat-label>Buscar sucursal, provincia o estado</mat-label>
+          <input matInput (input)="applyFilter($any($event.target).value)" placeholder="Ej: Córdoba">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <div class="table-container">
+          <table mat-table [dataSource]="issues" matSort>
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+              <td mat-cell *matCellDef="let s">{{ s.id }}</td>
+            </ng-container>
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Sucursal</th>
+              <td mat-cell *matCellDef="let s"><strong>{{ s.nombre }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="provincia">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Provincia</th>
+              <td mat-cell *matCellDef="let s">{{ s.provincia }}</td>
+            </ng-container>
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado</th>
+              <td mat-cell *matCellDef="let s">{{ s.estado }}</td>
+            </ng-container>
+            <ng-container matColumnDef="problemas">
+              <th mat-header-cell *matHeaderCellDef>Problemas</th>
+              <td mat-cell *matCellDef="let s">
+                @if (s.sinCoord) { <mat-chip class="issue warn">Sin coordenadas</mat-chip> }
+                @if (s.coordInvalida) { <mat-chip class="issue bad">Coord. inválida</mat-chip> }
+                @if (s.sinDist) { <mat-chip class="issue">Sin distribuidor</mat-chip> }
+                @if (s.sinSocial) { <mat-chip class="issue">Sin red social</mat-chip> }
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="issueColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: issueColumns;"></tr>
+          </table>
+        </div>
+        <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" [pageSize]="25" showFirstLastButtons></mat-paginator>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="chart-row">
+    <mat-card class="chart-card full">
+      <mat-card-header><mat-card-title>Resumen de Calidad por Provincia</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="d.provincias">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Provincia</th>
+              <td mat-cell *matCellDef="let p"><strong>{{p.nombre}}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef>Total</th>
+              <td mat-cell *matCellDef="let p">{{p.total}}</td>
+            </ng-container>
+            <ng-container matColumnDef="sinSocial">
+              <th mat-header-cell *matHeaderCellDef>Sin Red Social</th>
+              <td mat-cell *matCellDef="let p">{{p.sinSocial}}</td>
+            </ng-container>
+            <ng-container matColumnDef="sinDist">
+              <th mat-header-cell *matHeaderCellDef>Sin Distribuidor</th>
+              <td mat-cell *matCellDef="let p">{{p.sinDist}}</td>
+            </ng-container>
+            <ng-container matColumnDef="sinCoord">
+              <th mat-header-cell *matHeaderCellDef>Sin Coordenadas</th>
+              <td mat-cell *matCellDef="let p">{{p.sinCoord}}</td>
+            </ng-container>
+            <ng-container matColumnDef="pctCoberturaSocial">
+              <th mat-header-cell *matHeaderCellDef>% Cobertura Social</th>
+              <td mat-cell *matCellDef="let p">{{p.pctCoberturaSocial}}%</td>
+            </ng-container>
+            <ng-container matColumnDef="pctCoberturaDist">
+              <th mat-header-cell *matHeaderCellDef>% Cobertura Dist.</th>
+              <td mat-cell *matCellDef="let p">{{p.pctCoberturaDist}}%</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

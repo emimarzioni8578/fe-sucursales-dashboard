@@ -1,0 +1,15 @@
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+mat-chip { font-size: 11px; }
+mat-chip.bad { background: #c62828; --mdc-chip-label-text-color: #fff; }
+mat-chip.warn { background: #e65100; --mdc-chip-label-text-color: #fff; }
+mat-chip.muted { background: #78909c; --mdc-chip-label-text-color: #fff; }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; margin-bottom: 16px; }
+.field { display: flex; flex-direction: column; }
+.field .k { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #999; }
+.field .v { font-size: 14px; }
+
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.metric { text-align: center; background: var(--mat-sys-surface-container, #f5f5f5); border-radius: 8px; padding: 10px; }
+.metric .num { font-size: 22px; font-weight: 700; }
+.metric .lbl { font-size: 11px; color: #888; }

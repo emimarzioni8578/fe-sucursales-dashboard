@@ -1,0 +1,23 @@
+.app-toolbar { position: sticky; top: 0; z-index: 100; gap: 4px;
+  .app-title { font-weight: 600; margin-right: 16px; }
+  .spacer { flex: 1 1 auto; }
+  button.active { background: rgba(255,255,255,.15); border-radius: 8px; }
+  mat-icon { margin-right: 4px; font-size: 20px; width: 20px; height: 20px; }
+}
+.global-search {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,.15); border-radius: 20px; padding: 2px 12px; margin-left: 8px;
+  .gs-icon { margin: 0; opacity: .9; }
+  input {
+    background: transparent; border: none; outline: none; color: inherit;
+    font-size: 14px; width: 180px;
+    &::placeholder { color: rgba(255,255,255,.7); }
+  }
+}
+.main-content { padding: 24px; max-width: 1600px; margin: 0 auto; }
+.loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 16px; color: #666; }
+.error-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 12px; text-align: center; color: #555;
+  .error-icon { font-size: 56px; width: 56px; height: 56px; color: #ef5350; }
+  h2 { margin: 0; }
+  .error-message { max-width: 560px; color: #777; }
+}

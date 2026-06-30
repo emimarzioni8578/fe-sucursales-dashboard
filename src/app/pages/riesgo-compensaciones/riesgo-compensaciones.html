@@ -1,0 +1,31 @@
+@if (data$ | async; as d) {
+  <h1>Riesgo y Compensaciones</h1>
+  <p class="subtitle">Gestión de solicitudes de compensación, errores y estado operativo</p>
+  <div class="kpi-row">
+    <app-kpi-card label="Compensaciones Totales" [value]="d.totalComp" [trend]="d.trends.compTotal" color="blue" />
+    <app-kpi-card label="Compensaciones Abiertas" [value]="d.compAbiertas" [sub]="d.pctCompAbiertas + '% del total'" [trend]="d.trends.compAbiertas" [trendInverse]="true" color="orange" />
+    <app-kpi-card label="Edad Promedio (Abiertas)" [value]="d.edadPromedioComp + ' días'" color="red" />
+    <app-kpi-card label="Errores Registrados" [value]="d.totalErrores" color="purple" />
+    <app-kpi-card label="Score Riesgo Operativo" [value]="d.scoreRiesgo" color="green" />
+  </div>
+
+  <h2 class="section-title">Antigüedad de compensaciones abiertas (aging)</h2>
+  <div class="kpi-row">
+    <app-kpi-card label="0–7 días" [value]="d.compAging.b0_7" sub="Recientes" color="green" />
+    <app-kpi-card label="8–30 días" [value]="d.compAging.b8_30" sub="En seguimiento" color="orange" />
+    <app-kpi-card label="Más de 30 días" [value]="d.compAging.b31plus" sub="Backlog crítico" color="red" />
+  </div>
+  <div class="kpi-row">
+    <app-kpi-card label="Pendientes" [value]="d.compPendientes" color="teal" />
+    <app-kpi-card label="En Revisión" [value]="d.compEnRevision" color="orange" />
+    <app-kpi-card label="Aprobadas" [value]="d.compAprobadas" color="green" />
+    <app-kpi-card label="Rechazadas" [value]="d.compRechazadas" color="red" />
+  </div>
+  <div class="chart-row">
+    <mat-card class="chart-card"><mat-card-header><mat-card-title>Compensaciones por Estado</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="getEstadoData(d)" [type]="doughnutType" [options]="doughnutOptions"></canvas></mat-card-content></mat-card>
+    <mat-card class="chart-card"><mat-card-header><mat-card-title>Errores por Tipo</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="getErrorData(d)" [type]="barType" [options]="barOptions"></canvas></mat-card-content></mat-card>
+  </div>
+  <div class="chart-row">
+    <mat-card class="chart-card full"><mat-card-header><mat-card-title>Compensaciones por Mes</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="getCompMesData(d)" [type]="barType" [options]="stackedBarOptions"></canvas></mat-card-content></mat-card>
+  </div>
+}

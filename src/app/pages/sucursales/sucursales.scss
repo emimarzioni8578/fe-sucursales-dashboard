@@ -1,0 +1,17 @@
+.page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { color: #666; font-size: 14px; margin-bottom: 16px; }
+
+.drill-banner {
+  display: flex; align-items: center; gap: 10px;
+  background: #e8eaf6; color: #3949ab; border-radius: 8px;
+  padding: 8px 14px; margin-bottom: 16px; font-size: 14px;
+}
+.drill-banner mat-icon { font-size: 20px; width: 20px; height: 20px; }
+
+.search { width: 100%; max-width: 460px; margin-bottom: 8px; }
+.table-container { overflow-x: auto; }
+table { width: 100%; }
+mat-chip { font-size: 11px; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover { background: var(--mat-sys-surface-container-high, rgba(0,0,0,.04)); }

@@ -1,0 +1,7 @@
+MonitoringActionId,NombreAccion
+1,Insert
+2,Update
+3,Delete
+4,SoftDelete
+5,BulkInsert
+6,BulkUpdate

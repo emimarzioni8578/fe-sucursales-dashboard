@@ -1,0 +1,4 @@
+ErrorId,ErrorName
+1,LogicError
+2,RequestError
+3,BusinessError

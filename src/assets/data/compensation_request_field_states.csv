@@ -1,0 +1,4 @@
+CompensationRequestFieldStateId,NombreEstadoCampo
+1,Valid
+2,Invalid
+3,PendingReview

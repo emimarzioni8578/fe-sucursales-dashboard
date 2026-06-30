@@ -1,0 +1,23 @@
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 4px 0;
+  margin-bottom: 8px;
+}
+.fb-icon { color: #5c6bc0; }
+.fb-label { font-size: 13px; color: #666; font-weight: 500; }
+.filter-bar mat-form-field { width: 180px; }
+.filter-bar mat-form-field.date { width: 150px; }
+.presets { display: flex; align-items: center; gap: 6px; }
+.presets .preset {
+  --mdc-outlined-button-container-height: 32px;
+  font-size: 12px; line-height: 30px; padding: 0 10px; min-width: 0;
+}
+.presets .preset.active {
+  background: var(--mat-sys-primary, #1976d2);
+  color: var(--mat-sys-on-primary, #fff);
+  border-color: transparent;
+  font-weight: 600;
+}

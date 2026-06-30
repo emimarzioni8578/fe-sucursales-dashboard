@@ -1,0 +1,367 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Sucursales - Reporte Profesional</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:#f0f2f5;color:#1a1a2e}
+.nav-tabs{display:flex;background:#1a1a2e;padding:0;position:sticky;top:0;z-index:1000;overflow-x:auto}
+.nav-tab{padding:16px 24px;color:#a0a0b8;cursor:pointer;border:none;background:none;font-size:14px;font-weight:500;transition:all .2s;white-space:nowrap;border-bottom:3px solid transparent}
+.nav-tab:hover{color:#fff;background:rgba(255,255,255,.05)}
+.nav-tab.active{color:#4fc3f7;border-bottom-color:#4fc3f7;background:rgba(79,195,247,.08)}
+.page{display:none;padding:24px 32px;max-width:1600px;margin:0 auto}
+.page.active{display:block}
+h1{font-size:28px;font-weight:700;margin-bottom:4px;color:#1a1a2e}
+h2{font-size:20px;font-weight:600;margin-bottom:16px;color:#2d2d44}
+h3{font-size:16px;font-weight:600;margin-bottom:12px;color:#3d3d54}
+.subtitle{color:#666;font-size:14px;margin-bottom:24px}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.kpi-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #4fc3f7;transition:transform .2s}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.kpi-card .label{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:6px}
+.kpi-card .value{font-size:28px;font-weight:700;color:#1a1a2e}
+.kpi-card .sub{font-size:12px;color:#888;margin-top:4px}
+.kpi-card.blue{border-left-color:#4fc3f7}
+.kpi-card.green{border-left-color:#66bb6a}
+.kpi-card.orange{border-left-color:#ffa726}
+.kpi-card.red{border-left-color:#ef5350}
+.kpi-card.purple{border-left-color:#ab47bc}
+.kpi-card.teal{border-left-color:#26a69a}
+.chart-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:20px;margin-bottom:24px}
+.chart-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.chart-card.full{grid-column:1 / -1}
+.chart-card canvas{max-height:350px}
+.table-container{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f5f5f8;color:#555;font-weight:600;text-align:left;padding:10px 12px;border-bottom:2px solid #e0e0e0}
+td{padding:8px 12px;border-bottom:1px solid #f0f0f0}
+tr:hover td{background:#fafbfc}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-green{background:#e8f5e9;color:#2e7d32}
+.badge-red{background:#ffebee;color:#c62828}
+.badge-orange{background:#fff3e0;color:#e65100}
+.badge-blue{background:#e3f2fd;color:#1565c0}
+.badge-gray{background:#f5f5f5;color:#555}
+.dq-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.dq-card{background:#fff;border-radius:12px;padding:24px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.dq-card .number{font-size:36px;font-weight:700}
+.dq-card .desc{font-size:13px;color:#666;margin-top:4px}
+.dq-card .pct{font-size:20px;font-weight:600;margin-top:8px}
+.dq-card.good .number{color:#2e7d32}
+.dq-card.warn .number{color:#e65100}
+.dq-card.bad .number{color:#c62828}
+.dq-card.teal .number{color:#26a69a}
+.footer{text-align:center;padding:32px;color:#888;font-size:12px;border-top:1px solid #e0e0e0;margin-top:32px}
+@media print{.nav-tabs{display:none}.page{display:block!important;page-break-after:always}}
+</style>
+</head>
+<body>
+
+<div class="nav-tabs" id="navTabs">
+  <button class="nav-tab active" data-page="page1">Resumen Ejecutivo</button>
+  <button class="nav-tab" data-page="page2">OperaciÃ³n Territorial</button>
+  <button class="nav-tab" data-page="page3">Riesgo y Compensaciones</button>
+  <button class="nav-tab" data-page="page4">Emails y VerificaciÃ³n</button>
+  <button class="nav-tab" data-page="page5">AuditorÃ­a y Cambios</button>
+  <button class="nav-tab" data-page="page6">Calidad de Datos</button>
+</div>
+
+<!-- PAGE 1 -->
+<div id="page1" class="page active">
+  <h1>Resumen Ejecutivo</h1>
+  <p class="subtitle">Panel de control general del ecosistema de sucursales &mdash; Datos simulados al 2026-06-30</p>
+  <div class="kpi-row">
+    <div class="kpi-card blue"><div class="label">Total Sucursales</div><div class="value">800</div><div class="sub">634 activas &middot; 90 inactivas &middot; 76 pendientes</div></div>
+    <div class="kpi-card green"><div class="label">% Sucursales Activas</div><div class="value">79.2%</div><div class="sub">634 de 800 sucursales</div></div>
+    <div class="kpi-card teal"><div class="label">% Cobertura Distribuidor</div><div class="value">100%</div><div class="sub">800 sucursales con distribuidor</div></div>
+    <div class="kpi-card purple"><div class="label">% Cobertura Social</div><div class="value">87.9%</div><div class="sub">703 sucursales con red social</div></div>
+    <div class="kpi-card orange"><div class="label">Score Riesgo Operativo</div><div class="value">19.94</div><div class="sub">0.40&times;MailFail + 0.40&times;CompOpen + 0.20&times;SoftDel</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card"><h3>Sucursales por Provincia</h3><canvas id="chartSucursalesProv"></canvas></div>
+    <div class="chart-card"><h3>Estado de Sucursales</h3><canvas id="chartEstadoSucursales"></canvas></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card full"><h3>Compensaciones por Mes</h3><canvas id="chartCompMes"></canvas></div>
+  </div>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page2" class="page">
+  <h1>OperaciÃ³n Territorial</h1>
+  <p class="subtitle">DistribuciÃ³n geogrÃ¡fica de sucursales por provincia y localidad</p>
+  <div class="chart-row">
+    <div class="chart-card full"><h3>Detalle por Provincia</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Provincia</th><th>RegiÃ³n</th><th>Total</th><th>Activas</th><th>Inactivas</th><th>Pendientes</th><th>% Activas</th><th>Cobertura Dist.</th><th>Cobertura Social</th><th>Comp. Abiertas</th></tr></thead>
+          <tbody>            <tr><td><strong>Buenos Aires</strong></td><td><span class="badge badge-blue">Patagonia</span></td><td>193</td><td>159</td><td>14</td><td>20</td><td><span class="badge badge-green">82.4%</span></td><td>100%</td><td>87.6%</td><td>310</td></tr>            <tr><td><strong>Corrientes</strong></td><td><span class="badge badge-blue">AMBA</span></td><td>10</td><td>8</td><td>1</td><td>1</td><td><span class="badge badge-green">80%</span></td><td>100%</td><td>100%</td><td>23</td></tr>            <tr><td><strong>Santiago del Estero</strong></td><td><span class="badge badge-blue">Patagonia</span></td><td>3</td><td>3</td><td>0</td><td>0</td><td><span class="badge badge-green">100%</span></td><td>100%</td><td>100%</td><td>9</td></tr>            <tr><td><strong>San Juan</strong></td><td><span class="badge badge-blue">Patagonia</span></td><td>10</td><td>8</td><td>1</td><td>1</td><td><span class="badge badge-green">80%</span></td><td>100%</td><td>90%</td><td>29</td></tr>            <tr><td><strong>Jujuy</strong></td><td><span class="badge badge-blue">NOA</span></td><td>12</td><td>9</td><td>1</td><td>2</td><td><span class="badge badge-green">75%</span></td><td>100%</td><td>91.7%</td><td>18</td></tr>            <tr><td><strong>Río Negro</strong></td><td><span class="badge badge-blue">AMBA</span></td><td>5</td><td>5</td><td>0</td><td>0</td><td><span class="badge badge-green">100%</span></td><td>100%</td><td>80%</td><td>7</td></tr>            <tr><td><strong>Neuquén</strong></td><td><span class="badge badge-blue">NOA</span></td><td>4</td><td>2</td><td>1</td><td>1</td><td><span class="badge badge-orange">50%</span></td><td>100%</td><td>50%</td><td>9</td></tr>            <tr><td><strong>Formosa</strong></td><td><span class="badge badge-blue">NEA</span></td><td>8</td><td>5</td><td>1</td><td>2</td><td><span class="badge badge-orange">62.5%</span></td><td>100%</td><td>100%</td><td>11</td></tr>            <tr><td><strong>Chubut</strong></td><td><span class="badge badge-blue">AMBA</span></td><td>9</td><td>8</td><td>0</td><td>1</td><td><span class="badge badge-green">88.9%</span></td><td>100%</td><td>100%</td><td>10</td></tr>            <tr><td><strong>San Luis</strong></td><td><span class="badge badge-blue">AMBA</span></td><td>8</td><td>6</td><td>1</td><td>1</td><td><span class="badge badge-green">75%</span></td><td>100%</td><td>87.5%</td><td>18</td></tr>            <tr><td><strong>Catamarca</strong></td><td><span class="badge badge-blue">AMBA</span></td><td>8</td><td>6</td><td>1</td><td>1</td><td><span class="badge badge-green">75%</span></td><td>100%</td><td>87.5%</td><td>11</td></tr>            <tr><td><strong>Córdoba</strong></td><td><span class="badge badge-blue">AMBA</span></td><td>205</td><td>156</td><td>28</td><td>21</td><td><span class="badge badge-green">76.1%</span></td><td>100%</td><td>87.8%</td><td>318</td></tr>            <tr><td><strong>La Rioja</strong></td><td><span class="badge badge-blue">Centro</span></td><td>6</td><td>5</td><td>1</td><td>0</td><td><span class="badge badge-green">83.3%</span></td><td>100%</td><td>100%</td><td>11</td></tr>            <tr><td><strong>La Pampa</strong></td><td><span class="badge badge-blue">Centro</span></td><td>4</td><td>3</td><td>1</td><td>0</td><td><span class="badge badge-green">75%</span></td><td>100%</td><td>100%</td><td>2</td></tr>            <tr><td><strong>Santa Cruz</strong></td><td><span class="badge badge-blue">NOA</span></td><td>9</td><td>7</td><td>1</td><td>1</td><td><span class="badge badge-green">77.8%</span></td><td>100%</td><td>88.9%</td><td>10</td></tr>            <tr><td><strong>Tierra del Fuego</strong></td><td><span class="badge badge-blue">NOA</span></td><td>7</td><td>7</td><td>0</td><td>0</td><td><span class="badge badge-green">100%</span></td><td>100%</td><td>85.7%</td><td>13</td></tr>            <tr><td><strong>CABA</strong></td><td><span class="badge badge-blue">AMBA</span></td><td>88</td><td>72</td><td>11</td><td>5</td><td><span class="badge badge-green">81.8%</span></td><td>100%</td><td>90.9%</td><td>143</td></tr>            <tr><td><strong>Santa Fe</strong></td><td><span class="badge badge-blue">AMBA</span></td><td>86</td><td>70</td><td>9</td><td>7</td><td><span class="badge badge-green">81.4%</span></td><td>100%</td><td>87.2%</td><td>147</td></tr>            <tr><td><strong>Mendoza</strong></td><td><span class="badge badge-blue">Patagonia</span></td><td>73</td><td>58</td><td>8</td><td>7</td><td><span class="badge badge-green">79.5%</span></td><td>100%</td><td>80.8%</td><td>124</td></tr>            <tr><td><strong>Tucumán</strong></td><td><span class="badge badge-blue">Cuyo</span></td><td>7</td><td>2</td><td>4</td><td>1</td><td><span class="badge badge-red">28.6%</span></td><td>100%</td><td>100%</td><td>11</td></tr>            <tr><td><strong>Entre Ríos</strong></td><td><span class="badge badge-blue">Centro</span></td><td>12</td><td>7</td><td>5</td><td>0</td><td><span class="badge badge-orange">58.3%</span></td><td>100%</td><td>75%</td><td>23</td></tr>            <tr><td><strong>Salta</strong></td><td><span class="badge badge-blue">Centro</span></td><td>10</td><td>7</td><td>1</td><td>2</td><td><span class="badge badge-green">70%</span></td><td>100%</td><td>80%</td><td>9</td></tr>            <tr><td><strong>Misiones</strong></td><td><span class="badge badge-blue">Centro</span></td><td>13</td><td>12</td><td>0</td><td>1</td><td><span class="badge badge-green">92.3%</span></td><td>100%</td><td>92.3%</td><td>23</td></tr>            <tr><td><strong>Chaco</strong></td><td><span class="badge badge-blue">Patagonia</span></td><td>10</td><td>9</td><td>0</td><td>1</td><td><span class="badge badge-green">90%</span></td><td>100%</td><td>100%</td><td>17</td></tr>          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3 -->
+<div id="page3" class="page">
+  <h1>Riesgo y Compensaciones</h1>
+  <p class="subtitle">GestiÃ³n de solicitudes de compensaciÃ³n, errores y estado operativo</p>
+  <div class="kpi-row">
+    <div class="kpi-card blue"><div class="label">Compensaciones Totales</div><div class="value">3500</div></div>
+    <div class="kpi-card orange"><div class="label">Compensaciones Abiertas</div><div class="value">1306</div><div class="sub">37.3% del total</div></div>
+    <div class="kpi-card red"><div class="label">Edad Promedio (Abiertas)</div><div class="value">378 dÃ­as</div></div>
+    <div class="kpi-card purple"><div class="label">Errores Registrados</div><div class="value">3500</div></div>
+    <div class="kpi-card green"><div class="label">Score Riesgo Operativo</div><div class="value">19.94</div></div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-card teal"><div class="label">Pendientes</div><div class="value">807</div></div>
+    <div class="kpi-card orange"><div class="label">En RevisiÃ³n</div><div class="value">499</div></div>
+    <div class="kpi-card green"><div class="label">Aprobadas</div><div class="value">1873</div></div>
+    <div class="kpi-card red"><div class="label">Rechazadas</div><div class="value">321</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card"><h3>Compensaciones por Estado</h3><canvas id="chartCompEstado"></canvas></div>
+    <div class="chart-card"><h3>Errores por Tipo</h3><canvas id="chartErroresTipo"></canvas></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card full"><h3>Compensaciones por Mes</h3><canvas id="chartCompMes2"></canvas></div>
+  </div>
+</div>
+
+<!-- PAGE 4 -->
+<div id="page4" class="page">
+  <h1>Emails y VerificaciÃ³n</h1>
+  <p class="subtitle">Monitor de envÃ­o de correos, tasa de fallos y reintentos SMTP</p>
+  <div class="kpi-row">
+    <div class="kpi-card blue"><div class="label">Mails Totales</div><div class="value">6500</div></div>
+    <div class="kpi-card green"><div class="label">Mails Enviados</div><div class="value">5199</div></div>
+    <div class="kpi-card red"><div class="label">Mails Fallidos</div><div class="value">655</div><div class="sub">10.1% del total</div></div>
+    <div class="kpi-card orange"><div class="label">Reintentos SMTP</div><div class="value">1974</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card"><h3>Mails por Estado</h3><canvas id="chartMailsEstado"></canvas></div>
+    <div class="chart-card"><h3>Fallos por Asunto</h3><canvas id="chartMailsAsunto"></canvas></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card full"><h3>DistribuciÃ³n de Fallos por Provincia</h3><canvas id="chartMailsProvincia"></canvas></div>
+  </div>
+</div>
+
+<!-- PAGE 5 -->
+<div id="page5" class="page">
+  <h1>AuditorÃ­a y Cambios</h1>
+  <p class="subtitle">Registro de eventos de auditorÃ­a, acciones por tabla y operaciones masivas</p>
+  <div class="kpi-row">
+    <div class="kpi-card blue"><div class="label">Eventos de AuditorÃ­a</div><div class="value">14000</div></div>
+    <div class="kpi-card green"><div class="label">Inserciones</div><div class="value">3925</div></div>
+    <div class="kpi-card orange"><div class="label">Actualizaciones</div><div class="value">5661</div></div>
+    <div class="kpi-card red"><div class="label">Soft Deletes</div><div class="value">1629</div></div>
+    <div class="kpi-card purple"><div class="label">Bulk Operations</div><div class="value">2106</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card full"><h3>Eventos de AuditorÃ­a por Mes</h3><canvas id="chartAuditMes"></canvas></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card full"><h3>Acciones por Tabla</h3><canvas id="chartAuditTabla"></canvas></div>
+  </div>
+</div>
+
+<!-- PAGE 6 -->
+<div id="page6" class="page">
+  <h1>Calidad de Datos</h1>
+  <p class="subtitle">EvaluaciÃ³n de completitud y cobertura de la informaciÃ³n de sucursales</p>
+  <div class="dq-row">
+    <div class="dq-card bad"><div class="number">97</div><div class="desc">Sucursales sin Red Social</div><div class="pct">12.1%</div></div>
+    <div class="dq-card warn"><div class="number">0</div><div class="desc">Sucursales sin Distribuidor</div><div class="pct">0%</div></div>
+    <div class="dq-card good"><div class="number">0</div><div class="desc">Sucursales sin Coordenadas</div><div class="pct">0%</div></div>
+    <div class="dq-card teal"><div class="number">87.9%</div><div class="desc">Cobertura Social General</div></div>
+    <div class="dq-card teal"><div class="number">100%</div><div class="desc">Cobertura Distribuidor General</div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card full"><h3>Cobertura Social y de Distribuidor por Provincia</h3><canvas id="chartCoberturaProv"></canvas></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card full"><h3>Resumen de Calidad por Provincia</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Provincia</th><th>Total</th><th>Sin Red Social</th><th>Sin Distribuidor</th><th>Sin Coordenadas</th><th>% Cobertura Social</th><th>% Cobertura Dist.</th></tr></thead>
+          <tbody>            <tr><td><strong>Buenos Aires</strong></td><td>193</td><td>24</td><td>0</td><td>0</td><td>87.6%</td><td>100%</td></tr>            <tr><td><strong>Corrientes</strong></td><td>10</td><td>0</td><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>            <tr><td><strong>Santiago del Estero</strong></td><td>3</td><td>0</td><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>            <tr><td><strong>San Juan</strong></td><td>10</td><td>1</td><td>0</td><td>0</td><td>90%</td><td>100%</td></tr>            <tr><td><strong>Jujuy</strong></td><td>12</td><td>1</td><td>0</td><td>0</td><td>91.7%</td><td>100%</td></tr>            <tr><td><strong>Río Negro</strong></td><td>5</td><td>1</td><td>0</td><td>0</td><td>80%</td><td>100%</td></tr>            <tr><td><strong>Neuquén</strong></td><td>4</td><td>2</td><td>0</td><td>0</td><td>50%</td><td>100%</td></tr>            <tr><td><strong>Formosa</strong></td><td>8</td><td>0</td><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>            <tr><td><strong>Chubut</strong></td><td>9</td><td>0</td><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>            <tr><td><strong>San Luis</strong></td><td>8</td><td>1</td><td>0</td><td>0</td><td>87.5%</td><td>100%</td></tr>            <tr><td><strong>Catamarca</strong></td><td>8</td><td>1</td><td>0</td><td>0</td><td>87.5%</td><td>100%</td></tr>            <tr><td><strong>Córdoba</strong></td><td>205</td><td>25</td><td>0</td><td>0</td><td>87.8%</td><td>100%</td></tr>            <tr><td><strong>La Rioja</strong></td><td>6</td><td>0</td><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>            <tr><td><strong>La Pampa</strong></td><td>4</td><td>0</td><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>            <tr><td><strong>Santa Cruz</strong></td><td>9</td><td>1</td><td>0</td><td>0</td><td>88.9%</td><td>100%</td></tr>            <tr><td><strong>Tierra del Fuego</strong></td><td>7</td><td>1</td><td>0</td><td>0</td><td>85.7%</td><td>100%</td></tr>            <tr><td><strong>CABA</strong></td><td>88</td><td>8</td><td>0</td><td>0</td><td>90.9%</td><td>100%</td></tr>            <tr><td><strong>Santa Fe</strong></td><td>86</td><td>11</td><td>0</td><td>0</td><td>87.2%</td><td>100%</td></tr>            <tr><td><strong>Mendoza</strong></td><td>73</td><td>14</td><td>0</td><td>0</td><td>80.8%</td><td>100%</td></tr>            <tr><td><strong>Tucumán</strong></td><td>7</td><td>0</td><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>            <tr><td><strong>Entre Ríos</strong></td><td>12</td><td>3</td><td>0</td><td>0</td><td>75%</td><td>100%</td></tr>            <tr><td><strong>Salta</strong></td><td>10</td><td>2</td><td>0</td><td>0</td><td>80%</td><td>100%</td></tr>            <tr><td><strong>Misiones</strong></td><td>13</td><td>1</td><td>0</td><td>0</td><td>92.3%</td><td>100%</td></tr>            <tr><td><strong>Chaco</strong></td><td>10</td><td>0</td><td>0</td><td>0</td><td>100%</td><td>100%</td></tr>          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Reporte generado automÃ¡ticamente &middot; Datos simulados ms-sucursales &middot; 2026-06-29 00:53
+</div>
+
+<script>
+const provData = [{"compTotal":845,"total":193,"pctMailsFallidos":9.2,"sinDist":0,"inactivas":14,"mailsFallidos":145,"mailsTotal":1571,"region":"Patagonia","pctCoberturaSocial":87.6,"activas":159,"nombre":"Buenos Aires","sinSocial":24,"pendientes":20,"pctActivas":82.4,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":310},{"compTotal":46,"total":10,"pctMailsFallidos":8.9,"sinDist":0,"inactivas":1,"mailsFallidos":7,"mailsTotal":79,"region":"AMBA","pctCoberturaSocial":100,"activas":8,"nombre":"Corrientes","sinSocial":0,"pendientes":1,"pctActivas":80,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":23},{"compTotal":11,"total":3,"pctMailsFallidos":9.1,"sinDist":0,"inactivas":0,"mailsFallidos":2,"mailsTotal":22,"region":"Patagonia","pctCoberturaSocial":100,"activas":3,"nombre":"Santiago del Estero","sinSocial":0,"pendientes":0,"pctActivas":100,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":9},{"compTotal":54,"total":10,"pctMailsFallidos":12.5,"sinDist":0,"inactivas":1,"mailsFallidos":11,"mailsTotal":88,"region":"Patagonia","pctCoberturaSocial":90,"activas":8,"nombre":"San Juan","sinSocial":1,"pendientes":1,"pctActivas":80,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":29},{"compTotal":59,"total":12,"pctMailsFallidos":13.8,"sinDist":0,"inactivas":1,"mailsFallidos":12,"mailsTotal":87,"region":"NOA","pctCoberturaSocial":91.7,"activas":9,"nombre":"Jujuy","sinSocial":1,"pendientes":2,"pctActivas":75,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":18},{"compTotal":25,"total":5,"pctMailsFallidos":8.3,"sinDist":0,"inactivas":0,"mailsFallidos":3,"mailsTotal":36,"region":"AMBA","pctCoberturaSocial":80,"activas":5,"nombre":"Río Negro","sinSocial":1,"pendientes":0,"pctActivas":100,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":7},{"compTotal":18,"total":4,"pctMailsFallidos":10,"sinDist":0,"inactivas":1,"mailsFallidos":4,"mailsTotal":40,"region":"NOA","pctCoberturaSocial":50,"activas":2,"nombre":"Neuquén","sinSocial":2,"pendientes":1,"pctActivas":50,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":9},{"compTotal":41,"total":8,"pctMailsFallidos":7.2,"sinDist":0,"inactivas":1,"mailsFallidos":5,"mailsTotal":69,"region":"NEA","pctCoberturaSocial":100,"activas":5,"nombre":"Formosa","sinSocial":0,"pendientes":2,"pctActivas":62.5,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":11},{"compTotal":43,"total":9,"pctMailsFallidos":7.7,"sinDist":0,"inactivas":0,"mailsFallidos":6,"mailsTotal":78,"region":"AMBA","pctCoberturaSocial":100,"activas":8,"nombre":"Chubut","sinSocial":0,"pendientes":1,"pctActivas":88.9,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":10},{"compTotal":32,"total":8,"pctMailsFallidos":4.8,"sinDist":0,"inactivas":1,"mailsFallidos":3,"mailsTotal":62,"region":"AMBA","pctCoberturaSocial":87.5,"activas":6,"nombre":"San Luis","sinSocial":1,"pendientes":1,"pctActivas":75,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":18},{"compTotal":43,"total":8,"pctMailsFallidos":6.2,"sinDist":0,"inactivas":1,"mailsFallidos":4,"mailsTotal":64,"region":"AMBA","pctCoberturaSocial":87.5,"activas":6,"nombre":"Catamarca","sinSocial":1,"pendientes":1,"pctActivas":75,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":11},{"compTotal":848,"total":205,"pctMailsFallidos":10.7,"sinDist":0,"inactivas":28,"mailsFallidos":170,"mailsTotal":1594,"region":"AMBA","pctCoberturaSocial":87.8,"activas":156,"nombre":"Córdoba","sinSocial":25,"pendientes":21,"pctActivas":76.1,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":318},{"compTotal":25,"total":6,"pctMailsFallidos":16.1,"sinDist":0,"inactivas":1,"mailsFallidos":5,"mailsTotal":31,"region":"Centro","pctCoberturaSocial":100,"activas":5,"nombre":"La Rioja","sinSocial":0,"pendientes":0,"pctActivas":83.3,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":11},{"compTotal":15,"total":4,"pctMailsFallidos":14.8,"sinDist":0,"inactivas":1,"mailsFallidos":4,"mailsTotal":27,"region":"Centro","pctCoberturaSocial":100,"activas":3,"nombre":"La Pampa","sinSocial":0,"pendientes":0,"pctActivas":75,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":2},{"compTotal":28,"total":9,"pctMailsFallidos":9.1,"sinDist":0,"inactivas":1,"mailsFallidos":7,"mailsTotal":77,"region":"NOA","pctCoberturaSocial":88.9,"activas":7,"nombre":"Santa Cruz","sinSocial":1,"pendientes":1,"pctActivas":77.8,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":10},{"compTotal":32,"total":7,"pctMailsFallidos":11.1,"sinDist":0,"inactivas":0,"mailsFallidos":7,"mailsTotal":63,"region":"NOA","pctCoberturaSocial":85.7,"activas":7,"nombre":"Tierra del Fuego","sinSocial":1,"pendientes":0,"pctActivas":100,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":13},{"compTotal":395,"total":88,"pctMailsFallidos":9.5,"sinDist":0,"inactivas":11,"mailsFallidos":69,"mailsTotal":730,"region":"AMBA","pctCoberturaSocial":90.9,"activas":72,"nombre":"CABA","sinSocial":8,"pendientes":5,"pctActivas":81.8,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":143},{"compTotal":402,"total":86,"pctMailsFallidos":10.6,"sinDist":0,"inactivas":9,"mailsFallidos":75,"mailsTotal":708,"region":"AMBA","pctCoberturaSocial":87.2,"activas":70,"nombre":"Santa Fe","sinSocial":11,"pendientes":7,"pctActivas":81.4,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":147},{"compTotal":324,"total":73,"pctMailsFallidos":10.2,"sinDist":0,"inactivas":8,"mailsFallidos":65,"mailsTotal":639,"region":"Patagonia","pctCoberturaSocial":80.8,"activas":58,"nombre":"Mendoza","sinSocial":14,"pendientes":7,"pctActivas":79.5,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":124},{"compTotal":23,"total":7,"pctMailsFallidos":14.1,"sinDist":0,"inactivas":4,"mailsFallidos":9,"mailsTotal":64,"region":"Cuyo","pctCoberturaSocial":100,"activas":2,"nombre":"Tucumán","sinSocial":0,"pendientes":1,"pctActivas":28.6,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":11},{"compTotal":63,"total":12,"pctMailsFallidos":13.1,"sinDist":0,"inactivas":5,"mailsFallidos":11,"mailsTotal":84,"region":"Centro","pctCoberturaSocial":75,"activas":7,"nombre":"Entre Ríos","sinSocial":3,"pendientes":0,"pctActivas":58.3,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":23},{"compTotal":34,"total":10,"pctMailsFallidos":7.1,"sinDist":0,"inactivas":1,"mailsFallidos":6,"mailsTotal":85,"region":"Centro","pctCoberturaSocial":80,"activas":7,"nombre":"Salta","sinSocial":2,"pendientes":2,"pctActivas":70,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":9},{"compTotal":53,"total":13,"pctMailsFallidos":8.8,"sinDist":0,"inactivas":0,"mailsFallidos":10,"mailsTotal":113,"region":"Centro","pctCoberturaSocial":92.3,"activas":12,"nombre":"Misiones","sinSocial":1,"pendientes":1,"pctActivas":92.3,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":23},{"compTotal":41,"total":10,"pctMailsFallidos":16.9,"sinDist":0,"inactivas":0,"mailsFallidos":15,"mailsTotal":89,"region":"Patagonia","pctCoberturaSocial":100,"activas":9,"nombre":"Chaco","sinSocial":0,"pendientes":1,"pctActivas":90,"pctCoberturaDist":100,"sinCoord":0,"compAbiertas":17}];
+const compPorMes = [{"abiertas":34,"mes":"2024-01","total":129},{"abiertas":38,"mes":"2024-02","total":124},{"abiertas":32,"mes":"2024-03","total":111},{"abiertas":32,"mes":"2024-04","total":120},{"abiertas":35,"mes":"2024-05","total":112},{"abiertas":32,"mes":"2024-06","total":95},{"abiertas":39,"mes":"2024-07","total":115},{"abiertas":36,"mes":"2024-08","total":117},{"abiertas":42,"mes":"2024-09","total":113},{"abiertas":27,"mes":"2024-10","total":120},{"abiertas":36,"mes":"2024-11","total":101},{"abiertas":36,"mes":"2024-12","total":116},{"abiertas":27,"mes":"2025-01","total":108},{"abiertas":34,"mes":"2025-02","total":124},{"abiertas":38,"mes":"2025-03","total":115},{"abiertas":34,"mes":"2025-04","total":113},{"abiertas":38,"mes":"2025-05","total":136},{"abiertas":34,"mes":"2025-06","total":97},{"abiertas":33,"mes":"2025-07","total":103},{"abiertas":32,"mes":"2025-08","total":110},{"abiertas":31,"mes":"2025-09","total":108},{"abiertas":31,"mes":"2025-10","total":135},{"abiertas":38,"mes":"2025-11","total":112},{"abiertas":39,"mes":"2025-12","total":130},{"abiertas":74,"mes":"2026-01","total":124},{"abiertas":78,"mes":"2026-02","total":125},{"abiertas":81,"mes":"2026-03","total":116},{"abiertas":79,"mes":"2026-04","total":118},{"abiertas":94,"mes":"2026-05","total":139},{"abiertas":72,"mes":"2026-06","total":114}];
+const auditPorMes = [{"insert":112,"bulkinsert":38,"mes":"2024-01","delete":17,"bulkupdate":33,"update":196,"softdelete":64},{"insert":129,"bulkinsert":47,"mes":"2024-02","delete":19,"bulkupdate":29,"update":186,"softdelete":50},{"insert":130,"bulkinsert":31,"mes":"2024-03","delete":13,"bulkupdate":34,"update":207,"softdelete":46},{"insert":150,"bulkinsert":46,"mes":"2024-04","delete":21,"bulkupdate":27,"softdelete":57,"update":189},{"insert":135,"bulkinsert":46,"mes":"2024-05","delete":22,"bulkupdate":37,"update":175,"softdelete":55},{"insert":136,"bulkinsert":36,"mes":"2024-06","delete":31,"bulkupdate":29,"update":186,"softdelete":48},{"insert":136,"bulkinsert":36,"mes":"2024-07","delete":28,"bulkupdate":28,"update":188,"softdelete":44},{"insert":122,"bulkinsert":32,"mes":"2024-08","delete":20,"bulkupdate":45,"update":202,"softdelete":42},{"insert":126,"bulkinsert":28,"mes":"2024-09","delete":20,"bulkupdate":38,"update":207,"softdelete":64},{"insert":125,"bulkinsert":36,"mes":"2024-10","delete":25,"bulkupdate":32,"update":187,"softdelete":55},{"insert":127,"bulkinsert":41,"mes":"2024-11","delete":24,"bulkupdate":29,"update":188,"softdelete":52},{"insert":136,"bulkinsert":31,"mes":"2024-12","delete":28,"bulkupdate":37,"update":201,"softdelete":47},{"insert":127,"bulkinsert":37,"mes":"2025-01","delete":23,"bulkupdate":34,"update":182,"softdelete":57},{"insert":114,"bulkinsert":25,"mes":"2025-02","delete":20,"bulkupdate":24,"update":163,"softdelete":53},{"insert":144,"bulkinsert":37,"mes":"2025-03","delete":27,"bulkupdate":38,"update":182,"softdelete":59},{"insert":116,"bulkinsert":44,"mes":"2025-04","delete":22,"bulkupdate":25,"update":207,"softdelete":46},{"insert":148,"bulkinsert":38,"mes":"2025-05","delete":22,"bulkupdate":44,"update":201,"softdelete":66},{"insert":126,"bulkinsert":35,"mes":"2025-06","delete":16,"bulkupdate":37,"update":179,"softdelete":54},{"insert":127,"bulkinsert":43,"mes":"2025-07","delete":32,"bulkupdate":32,"update":200,"softdelete":58},{"insert":144,"bulkinsert":35,"mes":"2025-08","delete":32,"bulkupdate":37,"update":180,"softdelete":48},{"insert":117,"bulkinsert":37,"mes":"2025-09","delete":24,"bulkupdate":35,"update":175,"softdelete":57},{"insert":140,"bulkinsert":28,"mes":"2025-10","delete":24,"bulkupdate":25,"update":204,"softdelete":61},{"insert":115,"bulkinsert":31,"mes":"2025-11","delete":19,"bulkupdate":43,"update":184,"softdelete":52},{"insert":150,"bulkinsert":41,"mes":"2025-12","delete":16,"bulkupdate":38,"update":190,"softdelete":51},{"insert":129,"bulkinsert":33,"mes":"2026-01","delete":22,"bulkupdate":37,"update":187,"softdelete":54},{"insert":113,"bulkinsert":42,"mes":"2026-02","delete":18,"bulkupdate":31,"update":179,"softdelete":58},{"insert":143,"bulkinsert":30,"mes":"2026-03","delete":32,"bulkupdate":47,"update":204,"softdelete":73},{"insert":138,"bulkinsert":34,"mes":"2026-04","delete":22,"bulkupdate":29,"update":186,"softdelete":52},{"insert":129,"bulkinsert":28,"mes":"2026-05","delete":22,"bulkupdate":34,"update":175,"softdelete":52},{"insert":141,"bulkinsert":42,"mes":"2026-06","delete":18,"bulkupdate":30,"update":171,"softdelete":54}];
+const auditPorTabla = [{"insert":380,"bulkinsert":122,"update":573,"delete":61,"bulkupdate":111,"softdelete":171,"tabla":"COMPENSATION_REQUESTS"},{"insert":596,"bulkinsert":162,"update":845,"delete":93,"bulkupdate":158,"softdelete":248,"tabla":"DISTRIBUIDORES"},{"insert":470,"bulkinsert":122,"update":670,"delete":91,"bulkupdate":121,"softdelete":229,"tabla":"LOCALIDADES"},{"insert":471,"bulkinsert":121,"update":682,"delete":89,"bulkupdate":116,"softdelete":170,"tabla":"MAILS"},{"insert":1405,"bulkinsert":406,"update":2004,"delete":238,"bulkupdate":349,"softdelete":551,"tabla":"SUCURSALES"},{"insert":440,"bulkinsert":122,"update":687,"delete":92,"bulkupdate":116,"softdelete":200,"tabla":"USERS"},{"insert":163,"bulkinsert":33,"update":200,"delete":15,"bulkupdate":47,"softdelete":60,"tabla":"VERIFICATION_TOKENS"}];
+const erroresPorTipo = [{"total":1382,"tipo":"BusinessError"},{"total":1227,"tipo":"RequestError"},{"total":891,"tipo":"LogicError"}];
+const mailsPorAsunto = [{"total":1629,"asunto":"Eliminación de sucursal","fallidos":171},{"total":1605,"asunto":"Creación de sucursal","fallidos":141},{"total":1629,"asunto":"Verificación de email","fallidos":158},{"total":1637,"asunto":"Notificación operativa","fallidos":185}];
+
+const COLORS = ['#4fc3f7','#66bb6a','#ffa726','#ef5350','#ab47bc','#26a69a','#ffd54f','#ec407a','#4dd0e1','#7986cb','#90a4ae','#a1887f','#f48fb1','#ce93d8','#80cbc4'];
+
+// PAGE 1 - Sucursales por provincia
+new Chart(document.getElementById('chartSucursalesProv'), {
+  type: 'bar',
+  data: {
+    labels: provData.map(d => d.nombre),
+    datasets: [
+      { label: 'Activas', data: provData.map(d => d.activas), backgroundColor: '#66bb6a', borderRadius: 4 },
+      { label: 'Inactivas', data: provData.map(d => d.inactivas), backgroundColor: '#ef5350', borderRadius: 4 },
+      { label: 'Pendientes', data: provData.map(d => d.pendientes), backgroundColor: '#ffa726', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+});
+
+// Estado de sucursales
+new Chart(document.getElementById('chartEstadoSucursales'), {
+  type: 'doughnut',
+  data: { labels: ['Activas','Inactivas','Pendientes'], datasets: [{ data: [634,90,76], backgroundColor: ['#66bb6a','#ef5350','#ffa726'] }] },
+  options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+// Compensaciones por mes
+const compMeses = compPorMes.map(d => d.mes);
+const compTotalArr = compPorMes.map(d => d.total);
+const compAbiertasArr = compPorMes.map(d => d.abiertas);
+
+new Chart(document.getElementById('chartCompMes'), {
+  type: 'line',
+  data: {
+    labels: compMeses,
+    datasets: [
+      { label: 'Total', data: compTotalArr, borderColor: '#4fc3f7', backgroundColor: 'rgba(79,195,247,0.1)', fill: true, tension: 0.3 },
+      { label: 'Abiertas', data: compAbiertasArr, borderColor: '#ef5350', backgroundColor: 'rgba(239,83,80,0.1)', fill: true, tension: 0.3 }
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+});
+
+// PAGE 3 - Compensaciones por estado
+new Chart(document.getElementById('chartCompEstado'), {
+  type: 'doughnut',
+  data: { labels: ['Pendientes','En RevisiÃ³n','Aprobadas','Rechazadas'], datasets: [{ data: [807,499,1873,321], backgroundColor: ['#ffa726','#4fc3f7','#66bb6a','#ef5350'] }] },
+  options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+// Errores por tipo
+new Chart(document.getElementById('chartErroresTipo'), {
+  type: 'bar',
+  data: { labels: erroresPorTipo.map(d => d.tipo), datasets: [{ label: 'Cantidad', data: erroresPorTipo.map(d => d.total), backgroundColor: ['#4fc3f7','#ab47bc','#ffa726'], borderRadius: 4 }] },
+  options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+
+// Compensaciones por mes 2 (stacked bar)
+new Chart(document.getElementById('chartCompMes2'), {
+  type: 'bar',
+  data: {
+    labels: compMeses,
+    datasets: [
+      { label: 'Abiertas', data: compAbiertasArr, backgroundColor: '#ef5350', borderRadius: 4 },
+      { label: 'Cerradas', data: compTotalArr.map((v,i) => v - compAbiertasArr[i]), backgroundColor: '#66bb6a', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+});
+
+// PAGE 4 - Mails por estado
+new Chart(document.getElementById('chartMailsEstado'), {
+  type: 'doughnut',
+  data: { labels: ['Enviados','Fallidos','Pendientes'], datasets: [{ data: [5199,655,646], backgroundColor: ['#66bb6a','#ef5350','#ffa726'] }] },
+  options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+
+// Fallos por asunto
+new Chart(document.getElementById('chartMailsAsunto'), {
+  type: 'bar',
+  data: {
+    labels: mailsPorAsunto.map(d => d.asunto.length > 30 ? d.asunto.substring(0,30)+'...' : d.asunto),
+    datasets: [
+      { label: 'Total', data: mailsPorAsunto.map(d => d.total), backgroundColor: '#4fc3f7', borderRadius: 4 },
+      { label: 'Fallidos', data: mailsPorAsunto.map(d => d.fallidos), backgroundColor: '#ef5350', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } }, indexAxis: 'y' }
+});
+
+// Fallos por provincia
+const provMail = provData.filter(d => d.mailsTotal > 0);
+new Chart(document.getElementById('chartMailsProvincia'), {
+  type: 'bar',
+  data: {
+    labels: provMail.map(d => d.nombre),
+    datasets: [
+      { label: 'Mails Totales', data: provMail.map(d => d.mailsTotal), backgroundColor: '#4fc3f7', borderRadius: 4 },
+      { label: 'Mails Fallidos', data: provMail.map(d => d.mailsFallidos), backgroundColor: '#ef5350', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+});
+
+// PAGE 5 - AuditorÃ­a por mes
+const auditMeses = auditPorMes.map(d => d.mes);
+const actionTypes = ['insert','update','softdelete','bulkinsert','bulkupdate','delete'];
+const actionLabels = ['Insert','Update','SoftDelete','BulkInsert','BulkUpdate','Delete'];
+const actionColors = ['#66bb6a','#ffa726','#ef5350','#ab47bc','#4fc3f7','#90a4ae'];
+const auditDatasets = actionTypes.map((act, i) => ({
+  label: actionLabels[i],
+  data: auditPorMes.map(d => d[act] || 0),
+  backgroundColor: actionColors[i], borderRadius: 2
+}));
+
+new Chart(document.getElementById('chartAuditMes'), {
+  type: 'bar',
+  data: { labels: auditMeses, datasets: auditDatasets },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+});
+
+// Acciones por tabla
+const tablas = auditPorTabla.map(d => d.tabla);
+const tablaDatasets = actionTypes.map((act, i) => ({
+  label: actionLabels[i],
+  data: auditPorTabla.map(d => d[act] || 0),
+  backgroundColor: actionColors[i], borderRadius: 2
+}));
+
+new Chart(document.getElementById('chartAuditTabla'), {
+  type: 'bar',
+  data: { labels: tablas, datasets: tablaDatasets },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+});
+
+// PAGE 6 - Cobertura por provincia
+new Chart(document.getElementById('chartCoberturaProv'), {
+  type: 'bar',
+  data: {
+    labels: provData.map(d => d.nombre),
+    datasets: [
+      { label: 'Cobertura Social (%)', data: provData.map(d => d.pctCoberturaSocial), backgroundColor: '#ab47bc', borderRadius: 4 },
+      { label: 'Cobertura Distribuidor (%)', data: provData.map(d => d.pctCoberturaDist), backgroundColor: '#26a69a', borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true, max: 100 } } }
+});
+
+// NAVIGATION
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById(this.dataset.page).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

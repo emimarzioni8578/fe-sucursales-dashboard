@@ -1,0 +1,56 @@
+@if (options$ | async; as o) {
+  @if (active$ | async; as af) {
+    <div class="filter-bar">
+      <mat-icon class="fb-icon">filter_alt</mat-icon>
+      <span class="fb-label">Filtros:</span>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Región</mat-label>
+        <mat-select [value]="af.region" (selectionChange)="set('region', $event.value)">
+          <mat-option [value]="null">Todas</mat-option>
+          @for (r of o.regiones; track r) { <mat-option [value]="r">{{ r }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Provincia</mat-label>
+        <mat-select [value]="af.provincia" (selectionChange)="set('provincia', $event.value)">
+          <mat-option [value]="null">Todas</mat-option>
+          @for (p of o.provincias; track p.id) { <mat-option [value]="p.id">{{ p.nombre }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Estado</mat-label>
+        <mat-select [value]="af.estado" (selectionChange)="set('estado', $event.value)">
+          <mat-option [value]="null">Todos</mat-option>
+          @for (e of o.estados; track e) { <mat-option [value]="e">{{ e }}</mat-option> }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="date">
+        <mat-label>Desde</mat-label>
+        <input matInput type="date" [value]="af.desde ?? ''" (change)="set('desde', $any($event.target).value)"
+               matTooltip="Acota compensaciones, mails y auditoría" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="date">
+        <mat-label>Hasta</mat-label>
+        <input matInput type="date" [value]="af.hasta ?? ''" (change)="set('hasta', $any($event.target).value)" />
+      </mat-form-field>
+
+      <div class="presets">
+        @for (p of presets; track p.key) {
+          <button mat-stroked-button class="preset" [class.active]="isActivePreset(p.key, af)"
+                  [attr.aria-pressed]="isActivePreset(p.key, af)" (click)="applyPreset(p.key)">{{ p.label }}</button>
+        }
+      </div>
+
+      @if (af.region || af.provincia || af.estado || af.desde || af.hasta) {
+        <button mat-stroked-button (click)="clear()">
+          <mat-icon>close</mat-icon> Limpiar
+        </button>
+      }
+    </div>
+  }
+}

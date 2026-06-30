@@ -1,0 +1,118 @@
+LocalidadId,ProvinciaId,NombreLocalidad
+1,1,La Plata
+2,1,Mar del Plata
+3,1,Bahía Blanca
+4,1,Tigre
+5,1,Morón
+6,1,Lanús
+7,1,Quilmes
+8,1,San Isidro
+9,1,Luján
+10,1,Pergamino
+11,2,Córdoba Capital
+12,2,Villa María
+13,2,Río Cuarto
+14,2,Carlos Paz
+15,2,Alta Gracia
+16,2,San Francisco
+17,2,Jesús María
+18,2,Bell Ville
+19,2,Río Tercero
+20,2,Cosquín
+21,3,Rosario
+22,3,Santa Fe
+23,3,Rafaela
+24,3,Venado Tuerto
+25,3,Reconquista
+26,3,Santo Tomé
+27,3,Esperanza
+28,4,Mendoza Capital
+29,4,Godoy Cruz
+30,4,San Rafael
+31,4,Maipú
+32,4,Guaymallén
+33,4,Las Heras
+34,4,Luján de Cuyo
+35,5,San Miguel de Tucumán
+36,5,Yerba Buena
+37,5,Tafí Viejo
+38,5,Concepción
+39,6,Entre Ríos Capital
+40,6,Entre Ríos Norte
+41,6,Entre Ríos Sur
+42,6,Entre Ríos Centro
+43,7,Salta Capital
+44,7,Salta Norte
+45,7,Salta Sur
+46,7,Salta Centro
+47,8,Misiones Capital
+48,8,Misiones Norte
+49,8,Misiones Sur
+50,8,Misiones Centro
+51,9,Chaco Capital
+52,9,Chaco Norte
+53,9,Chaco Sur
+54,9,Chaco Centro
+55,10,Corrientes Capital
+56,10,Corrientes Norte
+57,10,Corrientes Sur
+58,10,Corrientes Centro
+59,11,Santiago del Estero Capital
+60,11,Santiago del Estero Norte
+61,11,Santiago del Estero Sur
+62,11,Santiago del Estero Centro
+63,12,San Juan Capital
+64,12,San Juan Norte
+65,12,San Juan Sur
+66,12,San Juan Centro
+67,13,Jujuy Capital
+68,13,Jujuy Norte
+69,13,Jujuy Sur
+70,13,Jujuy Centro
+71,14,Río Negro Capital
+72,14,Río Negro Norte
+73,14,Río Negro Sur
+74,14,Río Negro Centro
+75,15,Neuquén Capital
+76,15,Neuquén Norte
+77,15,Neuquén Sur
+78,15,Neuquén Centro
+79,16,Formosa Capital
+80,16,Formosa Norte
+81,16,Formosa Sur
+82,16,Formosa Centro
+83,17,Chubut Capital
+84,17,Chubut Norte
+85,17,Chubut Sur
+86,17,Chubut Centro
+87,18,San Luis Capital
+88,18,San Luis Norte
+89,18,San Luis Sur
+90,18,San Luis Centro
+91,19,Catamarca Capital
+92,19,Catamarca Norte
+93,19,Catamarca Sur
+94,19,Catamarca Centro
+95,20,La Rioja Capital
+96,20,La Rioja Norte
+97,20,La Rioja Sur
+98,20,La Rioja Centro
+99,21,La Pampa Capital
+100,21,La Pampa Norte
+101,21,La Pampa Sur
+102,21,La Pampa Centro
+103,22,Santa Cruz Capital
+104,22,Santa Cruz Norte
+105,22,Santa Cruz Sur
+106,22,Santa Cruz Centro
+107,23,Tierra del Fuego Capital
+108,23,Tierra del Fuego Norte
+109,23,Tierra del Fuego Sur
+110,23,Tierra del Fuego Centro
+111,24,Palermo
+112,24,Recoleta
+113,24,Belgrano
+114,24,Caballito
+115,24,Flores
+116,24,Villa Urquiza
+117,24,Retiro

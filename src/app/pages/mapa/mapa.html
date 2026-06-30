@@ -1,0 +1,39 @@
+<h1>Mapa de Sucursales</h1>
+<p class="subtitle">Distribución geográfica y mapa de calor de sucursales</p>
+
+<mat-card class="controls-card">
+  <mat-card-content class="controls">
+    <div class="control-group">
+      <span class="control-label">Mapa de calor por:</span>
+      <mat-button-toggle-group [value]="metric()" (change)="setMetric($event.value)" hideSingleSelectionIndicator>
+        <mat-button-toggle value="densidad">Densidad</mat-button-toggle>
+        <mat-button-toggle value="riesgo">Riesgo</mat-button-toggle>
+        <mat-button-toggle value="mails">Mails fallidos</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <mat-slide-toggle [checked]="showMarkers()" (change)="toggleMarkers($event.checked)">
+      Mostrar marcadores
+    </mat-slide-toggle>
+
+    <span class="spacer"></span>
+
+    <div class="stats">
+      <span><mat-icon>place</mat-icon> {{ stats().plotted }} ubicadas</span>
+      <span class="muted">de {{ stats().total }}</span>
+      @if (stats().invalid > 0) {
+        <span class="warn"><mat-icon>warning</mat-icon> {{ stats().invalid }} coord. inválidas</span>
+      }
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<div class="map-wrapper">
+  <div #mapEl class="map-container"></div>
+  <div class="legend">
+    <div class="legend-title">Estado</div>
+    <div class="legend-item"><span class="dot" style="background:#66bb6a"></span> Activa</div>
+    <div class="legend-item"><span class="dot" style="background:#ef5350"></span> Inactiva</div>
+    <div class="legend-item"><span class="dot" style="background:#ffa726"></span> Pendiente</div>
+  </div>
+</div>

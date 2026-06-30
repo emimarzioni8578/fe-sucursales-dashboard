@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>{{ s.nombre }}</h2>
+<mat-dialog-content>
+  <div class="badges">
+    <mat-chip>{{ s.estado }}</mat-chip>
+    @if (s.isDeleted) { <mat-chip class="bad">Eliminada</mat-chip> }
+    @if (s.sinCoord) { <mat-chip class="warn">Sin coordenadas</mat-chip> }
+    @if (s.coordInvalida) { <mat-chip class="bad">Coord. inválida</mat-chip> }
+    @if (!s.tieneDist) { <mat-chip class="muted">Sin distribuidor</mat-chip> }
+    @if (!s.tieneSocial) { <mat-chip class="muted">Sin red social</mat-chip> }
+  </div>
+
+  <div class="grid">
+    <div class="field"><span class="k">ID</span><span class="v">{{ s.id }}</span></div>
+    <div class="field"><span class="k">Provincia</span><span class="v">{{ s.provincia }} ({{ s.region }})</span></div>
+    <div class="field"><span class="k">Localidad</span><span class="v">{{ s.localidad }}</span></div>
+    <div class="field"><span class="k">Dirección</span><span class="v">{{ s.direccion }} — CP {{ s.codigoPostal }}</span></div>
+    <div class="field"><span class="k">Email</span><span class="v">{{ s.email }}</span></div>
+    <div class="field"><span class="k">Teléfono</span><span class="v">{{ s.telefono }}</span></div>
+    <div class="field"><span class="k">Apertura</span><span class="v">{{ s.fechaApertura }}</span></div>
+    <div class="field"><span class="k">Coordenadas</span><span class="v">{{ s.lat !== null ? s.lat + ', ' + s.lng : '—' }}</span></div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="num">{{ s.compAbiertas }}</div><div class="lbl">Comp. abiertas</div></div>
+    <div class="metric"><div class="num">{{ s.compTotal }}</div><div class="lbl">Comp. totales</div></div>
+    <div class="metric"><div class="num">{{ s.mailsFallidos }}</div><div class="lbl">Mails fallidos</div></div>
+    <div class="metric"><div class="num">{{ s.riesgo }}</div><div class="lbl">Score riesgo</div></div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cerrar</button>
+</mat-dialog-actions>

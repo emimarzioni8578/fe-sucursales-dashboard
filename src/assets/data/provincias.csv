@@ -1,0 +1,25 @@
+ProvinciaId,NombreProvincia,Region
+1,Buenos Aires,Patagonia
+2,Córdoba,AMBA
+3,Santa Fe,AMBA
+4,Mendoza,Patagonia
+5,Tucumán,Cuyo
+6,Entre Ríos,Centro
+7,Salta,Centro
+8,Misiones,Centro
+9,Chaco,Patagonia
+10,Corrientes,AMBA
+11,Santiago del Estero,Patagonia
+12,San Juan,Patagonia
+13,Jujuy,NOA
+14,Río Negro,AMBA
+15,Neuquén,NOA
+16,Formosa,NEA
+17,Chubut,AMBA
+18,San Luis,AMBA
+19,Catamarca,AMBA
+20,La Rioja,Centro
+21,La Pampa,Centro
+22,Santa Cruz,NOA
+23,Tierra del Fuego,NOA
+24,CABA,AMBA

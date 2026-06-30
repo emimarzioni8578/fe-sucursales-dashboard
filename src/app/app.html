@@ -1,0 +1,54 @@
+<mat-toolbar color="primary" class="app-toolbar">
+  <span class="app-title">Sucursales Dashboard</span>
+
+  @if ((state$ | async)?.status === 'ready') {
+    <div class="global-search">
+      <mat-icon class="gs-icon">search</mat-icon>
+      <input type="text" placeholder="Buscar sucursal…" [matAutocomplete]="auto"
+             (input)="onSearch($any($event.target).value)" #searchInput aria-label="Buscar sucursal" />
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="openResult($event.option.value); searchInput.value=''">
+        @for (r of searchResults(); track r.id) {
+          <mat-option [value]="r">{{ r.nombre }} — {{ r.provincia }} ({{ r.estado }})</mat-option>
+        }
+      </mat-autocomplete>
+    </div>
+  }
+
+  <span class="spacer"></span>
+  @for (item of navItems; track item.path) {
+    <button mat-button [routerLink]="item.path" [class.active]="isActive(item.path)">
+      <mat-icon>{{item.icon}}</mat-icon>
+      {{item.label}}
+    </button>
+  }
+  <button mat-icon-button (click)="toggleTheme()" [matTooltip]="dark() ? 'Tema claro' : 'Tema oscuro'">
+    <mat-icon>{{ dark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+</mat-toolbar>
+
+<main class="main-content">
+  @if (state$ | async; as s) {
+    @switch (s.status) {
+      @case ('ready') {
+        <app-filter-bar />
+        <router-outlet />
+      }
+      @case ('error') {
+        <div class="error-container">
+          <mat-icon class="error-icon">error_outline</mat-icon>
+          <h2>No se pudieron cargar los datos</h2>
+          <p class="error-message">{{ s.error }}</p>
+          <button mat-raised-button color="primary" (click)="reload()">
+            <mat-icon>refresh</mat-icon> Reintentar
+          </button>
+        </div>
+      }
+      @default {
+        <div class="loading-container">
+          <mat-spinner diameter="48"></mat-spinner>
+          <p>Cargando datos...</p>
+        </div>
+      }
+    }
+  }
+</main>

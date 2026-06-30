@@ -1,0 +1,33 @@
+:host { display: block; }
+
+h1 { margin: 0 0 4px; }
+.subtitle { color: #777; margin: 0 0 16px; }
+
+.controls-card { border-radius: 12px; margin-bottom: 16px; }
+.controls { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.control-group { display: flex; align-items: center; gap: 10px; }
+.control-label { font-size: 13px; color: #555; }
+.spacer { flex: 1 1 auto; }
+
+.stats { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #444; }
+.stats mat-icon { font-size: 18px; width: 18px; height: 18px; vertical-align: middle; }
+.stats .muted { color: #999; }
+.stats .warn { color: #e65100; font-weight: 600; }
+
+.map-wrapper { position: relative; }
+.map-container {
+  height: calc(100vh - 280px);
+  min-height: 480px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12);
+}
+
+.legend {
+  position: absolute; bottom: 18px; right: 12px; z-index: 500;
+  background: rgba(255,255,255,.92); padding: 10px 12px; border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2); font-size: 12px;
+}
+.legend-title { font-weight: 600; margin-bottom: 6px; }
+.legend-item { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+.legend-item .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
