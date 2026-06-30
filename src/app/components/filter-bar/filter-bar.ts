@@ -6,8 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DataService, DashboardFilter } from '../../services/data';
-import { presetRange, RangePreset, RANGE_PRESETS } from '../../services/date-presets.util';
+import { DashboardSource, DashboardFilter } from '@services/dashboard-source';
+import { presetRange, RangePreset, RANGE_PRESETS } from '@services/date-presets.util';
 
 @Component({
   selector: 'app-filter-bar',
@@ -17,7 +17,7 @@ import { presetRange, RangePreset, RANGE_PRESETS } from '../../services/date-pre
   styleUrl: './filter-bar.scss',
 })
 export class FilterBarComponent {
-  private data = inject(DataService);
+  private data = inject(DashboardSource);
   options$ = this.data.filterOptions$;
   active$ = this.data.activeFilter$;
   presets = RANGE_PRESETS;

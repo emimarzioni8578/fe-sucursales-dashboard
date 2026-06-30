@@ -2,12 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { SucursalesComponent } from './sucursales';
-import { DataService } from '../../services/data';
-import { createMockDataService, makeDashboardData, makeSucursalRow } from '../../testing/mocks';
+import { DashboardSource } from '@services/dashboard-source';
+import { createMockDataService, makeDashboardData, makeSucursalRow } from '@testing/mocks';
 
 describe('SucursalesComponent', () => {
   let cmp: SucursalesComponent;
-  let data: DataService;
+  let data: DashboardSource;
   const dialog = { open: vi.fn() };
 
   beforeEach(async () => {
@@ -17,7 +17,7 @@ describe('SucursalesComponent', () => {
       imports: [SucursalesComponent],
       providers: [
         provideNoopAnimations(),
-        { provide: DataService, useValue: data },
+        { provide: DashboardSource, useValue: data },
         { provide: MatDialog, useValue: dialog },
       ],
     }).compileComponents();

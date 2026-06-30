@@ -11,10 +11,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
-import { DataService } from '../../services/data';
-import { exportToCsv } from '../../services/export.util';
-import { SucursalDetailDialog } from '../../components/sucursal-detail/sucursal-detail';
-import type { SucursalRow } from '../../models/data-models.model';
+import { DashboardSource } from '@services/dashboard-source';
+import { exportToCsv } from '@services/export.util';
+import { SucursalDetailDialog } from '@components/sucursal-detail/sucursal-detail';
+import type { SucursalRow } from '@models/data-models.model';
 
 @Component({
   selector: 'app-sucursales',
@@ -27,7 +27,7 @@ import type { SucursalRow } from '../../models/data-models.model';
   styleUrl: './sucursales.scss',
 })
 export class SucursalesComponent {
-  data = inject(DataService);
+  data = inject(DashboardSource);
   private dialog = inject(MatDialog);
   activeFilter$ = this.data.activeFilter$;
 

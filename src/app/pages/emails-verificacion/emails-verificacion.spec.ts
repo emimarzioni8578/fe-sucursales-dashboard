@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { BaseChartDirective } from 'ng2-charts';
 import { EmailsVerificacionComponent } from './emails-verificacion';
-import { DataService } from '../../services/data';
-import { MockBaseChartDirective } from '../../testing/mock-chart';
-import { createMockDataService, makeDashboardData } from '../../testing/mocks';
+import { DashboardSource } from '@services/dashboard-source';
+import { MockBaseChartDirective } from '@testing/mock-chart';
+import { createMockDataService, makeDashboardData } from '@testing/mocks';
 
 describe('EmailsVerificacionComponent', () => {
   let fixture: ComponentFixture<EmailsVerificacionComponent>;
@@ -13,7 +13,7 @@ describe('EmailsVerificacionComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [EmailsVerificacionComponent],
-      providers: [provideNoopAnimations(), { provide: DataService, useValue: createMockDataService() }],
+      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: createMockDataService() }],
     })
       .overrideComponent(EmailsVerificacionComponent, {
         remove: { imports: [BaseChartDirective] },

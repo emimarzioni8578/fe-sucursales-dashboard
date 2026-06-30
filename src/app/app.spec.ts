@@ -3,12 +3,12 @@ import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AppComponent } from './app';
-import { DataService } from './services/data';
+import { DashboardSource } from './services/dashboard-source';
 import { createMockDataService, makeSucursalRow } from './testing/mocks';
 
 describe('AppComponent', () => {
   let cmp: AppComponent;
-  let data: DataService;
+  let data: DashboardSource;
   const dialog = { open: vi.fn() };
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('AppComponent', () => {
       providers: [
         provideNoopAnimations(),
         provideRouter([]),
-        { provide: DataService, useValue: data },
+        { provide: DashboardSource, useValue: data },
         { provide: MatDialog, useValue: dialog },
       ],
     }).compileComponents();

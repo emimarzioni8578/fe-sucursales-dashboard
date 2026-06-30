@@ -1,4 +1,4 @@
-@if (data$ | async; as d) {
+@if (d(); as d) {
   <h1>Calidad de Datos</h1>
   <p class="subtitle">Evaluación de completitud y cobertura de la información de sucursales</p>
 
@@ -11,7 +11,7 @@
   </div>
 
   <div class="chart-row">
-    <mat-card class="chart-card full"><mat-card-header><mat-card-title>Cobertura Social y de Distribuidor por Provincia</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="getCoberturaData(d)" [type]="barType" [options]="barOptions"></canvas></mat-card-content></mat-card>
+    <mat-card class="chart-card full"><mat-card-header><mat-card-title>Cobertura Social y de Distribuidor por Provincia</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="coberturaData()" [type]="barType" [options]="barOptions"></canvas></mat-card-content></mat-card>
   </div>
 
   <div class="chart-row">

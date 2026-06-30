@@ -1,4 +1,4 @@
-@if (data$ | async; as d) {
+@if (d(); as d) {
   <h1>Auditoría y Cambios</h1>
   <p class="subtitle">Registro de eventos de auditoría, acciones por tabla y operaciones masivas</p>
   <div class="kpi-row">
@@ -9,9 +9,9 @@
     <app-kpi-card label="Bulk Operations" [value]="d.bulkInserts + d.bulkUpdates" color="purple" />
   </div>
   <div class="chart-row">
-    <mat-card class="chart-card full"><mat-card-header><mat-card-title>Eventos de Auditoría por Mes</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="getAuditMesData(d)" [type]="barType" [options]="stackedOptions"></canvas></mat-card-content></mat-card>
+    <mat-card class="chart-card full"><mat-card-header><mat-card-title>Eventos de Auditoría por Mes</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="auditMesData()" [type]="barType" [options]="stackedOptions"></canvas></mat-card-content></mat-card>
   </div>
   <div class="chart-row">
-    <mat-card class="chart-card full"><mat-card-header><mat-card-title>Acciones por Tabla</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="getAuditTablaData(d)" [type]="barType" [options]="stackedOptions"></canvas></mat-card-content></mat-card>
+    <mat-card class="chart-card full"><mat-card-header><mat-card-title>Acciones por Tabla</mat-card-title></mat-card-header><mat-card-content><canvas baseChart [data]="auditTablaData()" [type]="barType" [options]="stackedOptions"></canvas></mat-card-content></mat-card>
   </div>
 }

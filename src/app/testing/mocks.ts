@@ -1,6 +1,6 @@
 import { of } from 'rxjs';
-import type { DataService } from '../services/data';
-import type { DashboardData, SucursalRow, ProvinciaData } from '../models/data-models.model';
+import type { DashboardSource } from '@services/dashboard-source';
+import type { DashboardData, SucursalRow, ProvinciaData } from '@models/data-models.model';
 
 export function makeSucursalRow(partial: Partial<SucursalRow> = {}): SucursalRow {
   return {
@@ -55,7 +55,7 @@ export function makeDashboardData(partial: Partial<DashboardData> = {}): Dashboa
   };
 }
 
-/** A DataService test double with spy-able methods. */
+/** A DashboardSource test double with spy-able methods. */
 export function createMockDataService(data: DashboardData = makeDashboardData()) {
   return {
     data$: of(data),
@@ -73,5 +73,5 @@ export function createMockDataService(data: DashboardData = makeDashboardData())
     reload: vi.fn(),
     searchSucursales: vi.fn(() => data.sucursales),
     getSucursal: vi.fn((id: string) => data.sucursales.find(s => s.id === id)),
-  } as unknown as DataService;
+  } as unknown as DashboardSource;
 }

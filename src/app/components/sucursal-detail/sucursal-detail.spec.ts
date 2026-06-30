@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SucursalDetailDialog } from './sucursal-detail';
-import { makeSucursalRow } from '../../testing/mocks';
+import { makeSucursalRow } from '@testing/mocks';
 
 describe('SucursalDetailDialog', () => {
   let fixture: ComponentFixture<SucursalDetailDialog>;

@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { BaseChartDirective } from 'ng2-charts';
 import { ResumenEjecutivoComponent } from './resumen-ejecutivo';
-import { DataService } from '../../services/data';
-import { MockBaseChartDirective } from '../../testing/mock-chart';
-import { createMockDataService, makeDashboardData } from '../../testing/mocks';
+import { DashboardSource } from '@services/dashboard-source';
+import { MockBaseChartDirective } from '@testing/mock-chart';
+import { createMockDataService, makeDashboardData } from '@testing/mocks';
 
 describe('ResumenEjecutivoComponent', () => {
   let fixture: ComponentFixture<ResumenEjecutivoComponent>;
@@ -13,7 +13,7 @@ describe('ResumenEjecutivoComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ResumenEjecutivoComponent],
-      providers: [provideNoopAnimations(), { provide: DataService, useValue: createMockDataService() }],
+      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: createMockDataService() }],
     })
       .overrideComponent(ResumenEjecutivoComponent, {
         remove: { imports: [BaseChartDirective] },

@@ -20,9 +20,9 @@ vi.mock('leaflet', () => {
 });
 
 import { MapaComponent } from './mapa';
-import { DataService } from '../../services/data';
-import { createMockDataService, makeDashboardData } from '../../testing/mocks';
-import type { SucursalGeo } from '../../models/data-models.model';
+import { DashboardSource } from '@services/dashboard-source';
+import { createMockDataService, makeDashboardData } from '@testing/mocks';
+import type { SucursalGeo } from '@models/data-models.model';
 
 const geo: SucursalGeo[] = [
   { id: 'S1', nombre: 'Uno', lat: -34.6, lng: -58.4, estado: 'Activa', provincia: 'BA', region: 'Pampeana', compAbiertas: 1, mailsFallidos: 0, riesgo: 2, coordValida: true },
@@ -39,7 +39,7 @@ describe('MapaComponent', () => {
     }));
     await TestBed.configureTestingModule({
       imports: [MapaComponent],
-      providers: [provideNoopAnimations(), { provide: DataService, useValue: data }],
+      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: data }],
     }).compileComponents();
     fixture = TestBed.createComponent(MapaComponent);
     cmp = fixture.componentInstance;

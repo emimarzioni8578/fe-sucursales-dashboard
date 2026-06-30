@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import type { SucursalRow } from '../../models/data-models.model';
+import type { SucursalRow } from '@models/data-models.model';
 
 @Component({
   selector: 'app-sucursal-detail',

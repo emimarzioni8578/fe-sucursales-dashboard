@@ -2,10 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { BaseChartDirective } from 'ng2-charts';
 import { CalidadDatosComponent } from './calidad-datos';
-import { DataService } from '../../services/data';
-import { MockBaseChartDirective } from '../../testing/mock-chart';
-import { createMockDataService, makeDashboardData } from '../../testing/mocks';
-import type { SucursalIssue } from '../../models/data-models.model';
+import { DashboardSource } from '@services/dashboard-source';
+import { MockBaseChartDirective } from '@testing/mock-chart';
+import { createMockDataService, makeDashboardData } from '@testing/mocks';
+import type { SucursalIssue } from '@models/data-models.model';
 
 const issue = (over: Partial<SucursalIssue> = {}): SucursalIssue => ({
   id: 'S2', nombre: 'Sucursal Dos', provincia: 'Cordoba', estado: 'Inactiva',
@@ -22,7 +22,7 @@ describe('CalidadDatosComponent', () => {
     }));
     await TestBed.configureTestingModule({
       imports: [CalidadDatosComponent],
-      providers: [provideNoopAnimations(), { provide: DataService, useValue: data }],
+      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: data }],
     })
       .overrideComponent(CalidadDatosComponent, {
         remove: { imports: [BaseChartDirective] },

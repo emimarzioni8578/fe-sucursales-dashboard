@@ -8,10 +8,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
-import { DataService } from './services/data';
-import { FilterBarComponent } from './components/filter-bar/filter-bar';
-import { SucursalDetailDialog } from './components/sucursal-detail/sucursal-detail';
-import type { SucursalRow } from './models/data-models.model';
+import { DashboardSource } from '@services/dashboard-source';
+import { FilterBarComponent } from '@components/filter-bar/filter-bar';
+import { SucursalDetailDialog } from '@components/sucursal-detail/sucursal-detail';
+import type { SucursalRow } from '@models/data-models.model';
 
 const THEME_KEY = 'sucursales-theme';
 
@@ -25,7 +25,7 @@ const THEME_KEY = 'sucursales-theme';
 export class AppComponent {
   private router = inject(Router);
   private dialog = inject(MatDialog);
-  data = inject(DataService);
+  data = inject(DashboardSource);
   state$ = this.data.state$;
   dark = signal(false);
   searchResults = signal<SucursalRow[]>([]);

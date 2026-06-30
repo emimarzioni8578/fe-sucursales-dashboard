@@ -9,9 +9,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DataService } from '../../services/data';
-import { exportToCsv } from '../../services/export.util';
-import type { ProvinciaData } from '../../models/data-models.model';
+import { DashboardSource } from '@services/dashboard-source';
+import { exportToCsv } from '@services/export.util';
+import type { ProvinciaData } from '@models/data-models.model';
 
 @Component({
   selector: 'app-operacion-territorial',
@@ -24,7 +24,7 @@ import type { ProvinciaData } from '../../models/data-models.model';
   styleUrl: './operacion-territorial.scss',
 })
 export class OperacionTerritorialComponent implements AfterViewInit {
-  private data = inject(DataService);
+  private data = inject(DashboardSource);
   private router = inject(Router);
   dataSource = new MatTableDataSource<ProvinciaData>([]);
   displayedColumns = ['nombre', 'region', 'total', 'activas', 'inactivas', 'pendientes', 'pctActivas', 'pctCoberturaDist', 'pctCoberturaSocial', 'compAbiertas'];

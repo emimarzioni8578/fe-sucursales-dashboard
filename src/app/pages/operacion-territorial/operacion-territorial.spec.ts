@@ -2,19 +2,19 @@ import { TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, Router } from '@angular/router';
 import { OperacionTerritorialComponent } from './operacion-territorial';
-import { DataService } from '../../services/data';
-import { createMockDataService, makeProvinciaData, makeDashboardData } from '../../testing/mocks';
+import { DashboardSource } from '@services/dashboard-source';
+import { createMockDataService, makeProvinciaData, makeDashboardData } from '@testing/mocks';
 
 describe('OperacionTerritorialComponent', () => {
   let cmp: OperacionTerritorialComponent;
-  let data: DataService;
+  let data: DashboardSource;
   let router: Router;
 
   beforeEach(async () => {
     data = createMockDataService(makeDashboardData());
     await TestBed.configureTestingModule({
       imports: [OperacionTerritorialComponent],
-      providers: [provideNoopAnimations(), provideRouter([]), { provide: DataService, useValue: data }],
+      providers: [provideNoopAnimations(), provideRouter([]), { provide: DashboardSource, useValue: data }],
     }).compileComponents();
     router = TestBed.inject(Router);
     cmp = TestBed.createComponent(OperacionTerritorialComponent).componentInstance;

@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { DataService, DashboardState } from './data';
-import type { DashboardData } from '../models/data-models.model';
+import { CsvDashboardService } from './csv-dashboard.service';
+import type { DashboardState } from './dashboard-source';
+import type { DashboardData } from '@models/data-models.model';
 
 const FILES = [
   'sucursales', 'provincias', 'localidades', 'distribuidores', 'sucursal_distribuidores',
@@ -81,13 +82,15 @@ function flushAll(http: HttpTestingController, fx = fixtures()): void {
   for (const f of FILES) http.expectOne(`assets/data/${f}.csv`).flush(fx[f]);
 }
 
-describe('DataService', () => {
-  let service: DataService;
+describe('CsvDashboardService', () => {
+  let service: CsvDashboardService;
   let http: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
-    service = TestBed.inject(DataService);
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), CsvDashboardService],
+    });
+    service = TestBed.inject(CsvDashboardService);
     http = TestBed.inject(HttpTestingController);
   });
 

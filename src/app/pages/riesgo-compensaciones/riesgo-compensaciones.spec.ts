@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { BaseChartDirective } from 'ng2-charts';
 import { RiesgoCompensacionesComponent } from './riesgo-compensaciones';
-import { DataService } from '../../services/data';
-import { MockBaseChartDirective } from '../../testing/mock-chart';
-import { createMockDataService, makeDashboardData } from '../../testing/mocks';
+import { DashboardSource } from '@services/dashboard-source';
+import { MockBaseChartDirective } from '@testing/mock-chart';
+import { createMockDataService, makeDashboardData } from '@testing/mocks';
 
 describe('RiesgoCompensacionesComponent', () => {
   let fixture: ComponentFixture<RiesgoCompensacionesComponent>;
@@ -13,7 +13,7 @@ describe('RiesgoCompensacionesComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RiesgoCompensacionesComponent],
-      providers: [provideNoopAnimations(), { provide: DataService, useValue: createMockDataService() }],
+      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: createMockDataService() }],
     })
       .overrideComponent(RiesgoCompensacionesComponent, {
         remove: { imports: [BaseChartDirective] },

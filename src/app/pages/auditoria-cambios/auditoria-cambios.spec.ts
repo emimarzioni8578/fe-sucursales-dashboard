@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { BaseChartDirective } from 'ng2-charts';
 import { AuditoriaCambiosComponent } from './auditoria-cambios';
-import { DataService } from '../../services/data';
-import { MockBaseChartDirective } from '../../testing/mock-chart';
-import { createMockDataService, makeDashboardData } from '../../testing/mocks';
+import { DashboardSource } from '@services/dashboard-source';
+import { MockBaseChartDirective } from '@testing/mock-chart';
+import { createMockDataService, makeDashboardData } from '@testing/mocks';
 
 describe('AuditoriaCambiosComponent', () => {
   let fixture: ComponentFixture<AuditoriaCambiosComponent>;
@@ -13,7 +13,7 @@ describe('AuditoriaCambiosComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AuditoriaCambiosComponent],
-      providers: [provideNoopAnimations(), { provide: DataService, useValue: createMockDataService() }],
+      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: createMockDataService() }],
     })
       .overrideComponent(AuditoriaCambiosComponent, {
         remove: { imports: [BaseChartDirective] },

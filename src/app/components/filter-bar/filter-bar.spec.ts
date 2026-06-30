@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { FilterBarComponent } from './filter-bar';
-import { DataService, DashboardFilter } from '../../services/data';
-import { presetRange } from '../../services/date-presets.util';
-import { createMockDataService } from '../../testing/mocks';
+import { DashboardSource, DashboardFilter } from '@services/dashboard-source';
+import { presetRange } from '@services/date-presets.util';
+import { createMockDataService } from '@testing/mocks';
 
 const filterWith = (over: Partial<DashboardFilter> = {}): DashboardFilter =>
   ({ provincia: null, region: null, estado: null, desde: null, hasta: null, ...over });
@@ -11,13 +11,13 @@ const filterWith = (over: Partial<DashboardFilter> = {}): DashboardFilter =>
 describe('FilterBarComponent', () => {
   let fixture: ComponentFixture<FilterBarComponent>;
   let cmp: FilterBarComponent;
-  let data: DataService;
+  let data: DashboardSource;
 
   beforeEach(async () => {
     data = createMockDataService();
     await TestBed.configureTestingModule({
       imports: [FilterBarComponent],
-      providers: [provideNoopAnimations(), { provide: DataService, useValue: data }],
+      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: data }],
     }).compileComponents();
     fixture = TestBed.createComponent(FilterBarComponent);
     cmp = fixture.componentInstance;
