@@ -1,24 +1,35 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { DashboardSource } from '@services/dashboard-source';
+import { topRiesgo } from '@services/aggregations';
 import { KpiCardComponent } from '@components/kpi-card/kpi-card';
-import type { DashboardData } from '@models/data-models.model';
+import { SucursalDetailDialog } from '@components/sucursal-detail/sucursal-detail';
+import type { DashboardData, SucursalRow } from '@models/data-models.model';
 import { PALETTE, ESTADO_SERIES_COLORS, emptyChart } from '@shared/chart-theme';
 
 @Component({
   selector: 'app-resumen-ejecutivo',
   standalone: true,
-  imports: [MatCardModule, MatGridListModule, BaseChartDirective, KpiCardComponent],
+  imports: [MatCardModule, MatGridListModule, MatTableModule, MatButtonModule, MatIconModule, BaseChartDirective, KpiCardComponent],
   templateUrl: './resumen-ejecutivo.html',
   styleUrl: './resumen-ejecutivo.scss',
 })
 export class ResumenEjecutivoComponent {
   private data = inject(DashboardSource);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
   d = toSignal(this.data.data$);
+
+  riesgoColumns = ['nombre', 'provincia', 'estado', 'compAbiertas', 'mailsFallidos', 'riesgo'];
 
   barChartType: ChartType = 'bar';
   doughnutType: ChartType = 'doughnut';
@@ -40,6 +51,21 @@ export class ResumenEjecutivoComponent {
   barData = computed<ChartData<'bar'>>(() => { const d = this.d(); return d ? this.getBarData(d) : emptyChart<'bar'>(); });
   estadoData = computed<ChartData<'doughnut'>>(() => { const d = this.d(); return d ? this.getEstadoData(d) : emptyChart<'doughnut'>(); });
   compMesData = computed<ChartData<'line'>>(() => { const d = this.d(); return d ? this.getCompMesData(d) : emptyChart<'line'>(); });
+
+  // Top sucursales de riesgo de la selección actual: convierte el Resumen en accionable.
+  topRiesgoRows = computed<SucursalRow[]>(() => { const d = this.d(); return d ? this.getTopRiesgo(d) : []; });
+
+  getTopRiesgo(d: DashboardData): SucursalRow[] {
+    return topRiesgo(d.sucursales, 10);
+  }
+
+  openDetail(row: SucursalRow): void {
+    this.dialog.open(SucursalDetailDialog, { data: row, width: '520px', maxWidth: '95vw' });
+  }
+
+  verTodas(): void {
+    this.router.navigate(['/sucursales']);
+  }
 
   getBarData(d: DashboardData): ChartData<'bar'> {
     const labels = d.provincias.map(p => p.nombre);

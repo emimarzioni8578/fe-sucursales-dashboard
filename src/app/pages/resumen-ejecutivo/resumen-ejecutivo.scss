@@ -4,3 +4,16 @@
 .chart-card mat-card-content canvas { max-height: 350px; }
 h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
 .subtitle { color: #666; font-size: 14px; margin-bottom: 24px; }
+
+.risk-card { margin-bottom: 24px; }
+.risk-card mat-card-header { display: flex; align-items: center; }
+.risk-card .head-spacer { flex: 1 1 auto; }
+.table-container { overflow-x: auto; }
+.risk-table { width: 100%; }
+.risk-table .num { text-align: right; }
+.risk-table tr.clickable { cursor: pointer; }
+.risk-table tr.clickable:hover { background: var(--mat-sys-surface-container, rgba(0, 0, 0, .04)); }
+.risk-badge {
+  display: inline-block; min-width: 28px; padding: 2px 8px; border-radius: 10px;
+  font-weight: 700; color: #fff; background: #ef5350;
+}

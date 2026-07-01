@@ -27,4 +27,49 @@
       <mat-card-content><canvas baseChart [data]="compMesData()" [type]="lineChartType" [options]="lineOptions"></canvas></mat-card-content>
     </mat-card>
   </div>
+
+  @if (topRiesgoRows().length) {
+    <mat-card class="risk-card">
+      <mat-card-header>
+        <mat-card-title>Sucursales de mayor riesgo</mat-card-title>
+        <span class="head-spacer"></span>
+        <button mat-button color="primary" (click)="verTodas()">
+          Ver todas <mat-icon>chevron_right</mat-icon>
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="topRiesgoRows()" class="risk-table">
+            <ng-container matColumnDef="nombre">
+              <th mat-header-cell *matHeaderCellDef>Sucursal</th>
+              <td mat-cell *matCellDef="let s"><strong>{{ s.nombre }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="provincia">
+              <th mat-header-cell *matHeaderCellDef>Provincia</th>
+              <td mat-cell *matCellDef="let s">{{ s.provincia }}</td>
+            </ng-container>
+            <ng-container matColumnDef="estado">
+              <th mat-header-cell *matHeaderCellDef>Estado</th>
+              <td mat-cell *matCellDef="let s">{{ s.estado }}</td>
+            </ng-container>
+            <ng-container matColumnDef="compAbiertas">
+              <th mat-header-cell *matHeaderCellDef class="num">Comp. abiertas</th>
+              <td mat-cell *matCellDef="let s" class="num">{{ s.compAbiertas }}</td>
+            </ng-container>
+            <ng-container matColumnDef="mailsFallidos">
+              <th mat-header-cell *matHeaderCellDef class="num">Mails fallidos</th>
+              <td mat-cell *matCellDef="let s" class="num">{{ s.mailsFallidos }}</td>
+            </ng-container>
+            <ng-container matColumnDef="riesgo">
+              <th mat-header-cell *matHeaderCellDef class="num">Riesgo</th>
+              <td mat-cell *matCellDef="let s" class="num"><span class="risk-badge">{{ s.riesgo }}</span></td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="riesgoColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: riesgoColumns;" class="clickable"
+                (click)="openDetail(row)"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
 }

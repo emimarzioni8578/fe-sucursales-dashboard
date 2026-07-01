@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { DashboardSource } from '@services/dashboard-source';
+import { FilterUrlSyncService } from '@services/filter-url-sync';
 import { FilterBarComponent } from '@components/filter-bar/filter-bar';
 import { SucursalDetailDialog } from '@components/sucursal-detail/sucursal-detail';
 import type { SucursalRow } from '@models/data-models.model';
@@ -25,6 +26,7 @@ const THEME_KEY = 'sucursales-theme';
 export class AppComponent {
   private router = inject(Router);
   private dialog = inject(MatDialog);
+  private filterUrlSync = inject(FilterUrlSyncService);
   data = inject(DashboardSource);
   state$ = this.data.state$;
   dark = signal(false);
@@ -42,6 +44,7 @@ export class AppComponent {
   constructor() {
     const saved = localStorage.getItem(THEME_KEY);
     this.setDark(saved === 'dark');
+    this.filterUrlSync.start();
   }
 
   reload(): void { this.data.reload(); }

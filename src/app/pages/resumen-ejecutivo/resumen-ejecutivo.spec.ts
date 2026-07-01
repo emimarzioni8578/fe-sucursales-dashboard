@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideRouter, Router } from '@angular/router';
 import { BaseChartDirective } from 'ng2-charts';
 import { ResumenEjecutivoComponent } from './resumen-ejecutivo';
 import { DashboardSource } from '@services/dashboard-source';
 import { MockBaseChartDirective } from '@testing/mock-chart';
-import { createMockDataService, makeDashboardData } from '@testing/mocks';
+import { createMockDataService, makeDashboardData, makeSucursalRow } from '@testing/mocks';
 
 describe('ResumenEjecutivoComponent', () => {
   let fixture: ComponentFixture<ResumenEjecutivoComponent>;
@@ -13,7 +14,7 @@ describe('ResumenEjecutivoComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ResumenEjecutivoComponent],
-      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: createMockDataService() }],
+      providers: [provideNoopAnimations(), provideRouter([]), { provide: DashboardSource, useValue: createMockDataService() }],
     })
       .overrideComponent(ResumenEjecutivoComponent, {
         remove: { imports: [BaseChartDirective] },
@@ -46,5 +47,23 @@ describe('ResumenEjecutivoComponent', () => {
     const line = cmp.getCompMesData(makeDashboardData());
     expect(line.labels).toEqual(['2024-01', '2024-02']);
     expect(line.datasets.length).toBe(2);
+  });
+
+  it('getTopRiesgo ranks branches by risk and drops zero-risk ones', () => {
+    const d = makeDashboardData({
+      sucursales: [
+        makeSucursalRow({ id: 'A', riesgo: 0 }),
+        makeSucursalRow({ id: 'B', riesgo: 7 }),
+        makeSucursalRow({ id: 'C', riesgo: 3 }),
+      ],
+    });
+    expect(cmp.getTopRiesgo(d).map(r => r.id)).toEqual(['B', 'C']);
+  });
+
+  it('verTodas navigates to the branch list', () => {
+    const router = TestBed.inject(Router);
+    const navSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+    cmp.verTodas();
+    expect(navSpy).toHaveBeenCalledWith(['/sucursales']);
   });
 });

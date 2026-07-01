@@ -9,8 +9,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { DashboardSource } from '@services/dashboard-source';
 import { exportToCsv } from '@services/export.util';
+import { provinciaBenchmark, type NetworkMetrics } from '@services/aggregations';
+import { ProvinciaDetailDialog } from '@components/provincia-detail/provincia-detail';
 import type { ProvinciaData } from '@models/data-models.model';
 
 @Component({
@@ -26,8 +29,12 @@ import type { ProvinciaData } from '@models/data-models.model';
 export class OperacionTerritorialComponent implements AfterViewInit {
   private data = inject(DashboardSource);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
   dataSource = new MatTableDataSource<ProvinciaData>([]);
   displayedColumns = ['nombre', 'region', 'total', 'activas', 'inactivas', 'pendientes', 'pctActivas', 'pctCoberturaDist', 'pctCoberturaSocial', 'compAbiertas'];
+
+  /** Promedios de red vigentes, para comparar cada provincia en el drill-down. */
+  private net: NetworkMetrics = { pctActivas: 0, pctCobDist: 0, pctCobSocial: 0, pctMailsFallidos: 0 };
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -35,6 +42,10 @@ export class OperacionTerritorialComponent implements AfterViewInit {
   constructor() {
     this.data.data$.pipe(takeUntilDestroyed()).subscribe(d => {
       this.dataSource.data = d.provincias;
+      this.net = {
+        pctActivas: d.pctActivas, pctCobDist: d.pctCobDist,
+        pctCobSocial: d.pctCobSocial, pctMailsFallidos: d.pctMailsFallidos,
+      };
     });
   }
 
@@ -43,10 +54,22 @@ export class OperacionTerritorialComponent implements AfterViewInit {
     this.dataSource.paginator = this.paginator;
   }
 
+  /** Drill-down: abre el detalle de la provincia con su benchmark contra la red. */
+  openProvincia(p: ProvinciaData): void {
+    const ref = this.dialog.open(ProvinciaDetailDialog, {
+      data: { provincia: p, benchmark: provinciaBenchmark(p, this.net) },
+      width: '520px', maxWidth: '95vw',
+    });
+    ref.afterClosed().subscribe(result => {
+      if (result === 'ver-sucursales') this.verSucursales(p);
+    });
+  }
+
   /** Drill-down: filtra por la provincia y navega al listado de sucursales. */
   verSucursales(p: ProvinciaData): void {
     this.data.setFilter({ provincia: p.provinciaId, region: null, estado: null });
-    this.router.navigate(['/sucursales']);
+    // El query param mantiene la URL compartible y evita que el sync la interprete como "limpiar".
+    this.router.navigate(['/sucursales'], { queryParams: { provincia: p.provinciaId } });
   }
 
   exportar(): void {

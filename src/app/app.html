@@ -16,7 +16,7 @@
 
   <span class="spacer"></span>
   @for (item of navItems; track item.path) {
-    <button mat-button [routerLink]="item.path" [class.active]="isActive(item.path)">
+    <button mat-button [routerLink]="item.path" queryParamsHandling="preserve" [class.active]="isActive(item.path)">
       <mat-icon>{{item.icon}}</mat-icon>
       {{item.label}}
     </button>

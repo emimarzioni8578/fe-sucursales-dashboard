@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>{{ p.nombre }}</h2>
+<mat-dialog-content>
+  <div class="badges">
+    <mat-chip>{{ p.region }}</mat-chip>
+    <mat-chip>{{ p.total }} sucursales</mat-chip>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="num">{{ p.activas }}</div><div class="lbl">Activas</div></div>
+    <div class="metric"><div class="num">{{ p.inactivas }}</div><div class="lbl">Inactivas</div></div>
+    <div class="metric"><div class="num">{{ p.pendientes }}</div><div class="lbl">Pendientes</div></div>
+    <div class="metric"><div class="num">{{ p.compAbiertas }}</div><div class="lbl">Comp. abiertas</div></div>
+  </div>
+
+  <h3 class="bench-title">Comparación contra el promedio de la red</h3>
+  <table class="bench">
+    <thead>
+      <tr><th>Métrica</th><th class="num">Provincia</th><th class="num">Red</th><th class="num">Δ</th></tr>
+    </thead>
+    <tbody>
+      @for (row of benchmark; track row.label) {
+        <tr>
+          <td>{{ row.label }}</td>
+          <td class="num">{{ row.value }}%</td>
+          <td class="num net">{{ row.network }}%</td>
+          <td class="num delta" [class.good]="isGood(row)" [class.bad]="!isGood(row)">
+            {{ row.delta > 0 ? '+' : '' }}{{ row.delta }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cerrar</button>
+  <button mat-raised-button color="primary" [mat-dialog-close]="'ver-sucursales'">
+    <mat-icon>store</mat-icon> Ver sucursales
+  </button>
+</mat-dialog-actions>

@@ -3,4 +3,6 @@ export * from './lookups';
 export * from './filter';
 export * from './sucursal-rows';
 export * from './sections';
+export * from './selectors';
+export * from './benchmark';
 export * from './compute-dashboard';

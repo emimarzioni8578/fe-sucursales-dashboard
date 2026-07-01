@@ -1,0 +1,17 @@
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+mat-chip { font-size: 11px; }
+
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.metric { text-align: center; background: var(--mat-sys-surface-container, #f5f5f5); border-radius: 8px; padding: 10px; }
+.metric .num { font-size: 22px; font-weight: 700; }
+.metric .lbl { font-size: 11px; color: #888; }
+
+.bench-title { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; color: #999; margin: 0 0 8px; }
+table.bench { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.bench th, table.bench td { padding: 6px 8px; border-bottom: 1px solid var(--mat-sys-outline-variant, #eee); }
+table.bench th { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: #999; text-align: left; }
+table.bench .num { text-align: right; }
+table.bench .net { color: #888; }
+table.bench .delta { font-weight: 700; }
+table.bench .delta.good { color: #2e7d32; }
+table.bench .delta.bad { color: #c62828; }
