@@ -1,5 +1,19 @@
 # SucursalesDashboard
 
+Dashboard analítico (SPA Angular 21) para el monitoreo operativo de una red de sucursales:
+estado de la red, cobertura comercial, compensaciones, emails de verificación, auditoría y
+calidad de datos.
+
+## Documentación
+
+| Documento | Contenido |
+|-----------|-----------|
+| [docs/README.md](./docs/README.md) | Índice + mapa mental en 30 segundos. |
+| [docs/arquitectura.md](./docs/arquitectura.md) | Arquitectura técnica: stack, capas, fuente de datos abstracta, agregación, build, migración al backend. |
+| [docs/funcional.md](./docs/funcional.md) | Documentación funcional: filtro global, conceptos de negocio y detalle de cada página. |
+| [docs/modelo-datos.md](./docs/modelo-datos.md) | Modelo de datos: diagrama entidad-relación y tablas CSV. |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Convenciones e invariantes de arquitectura para contribuir. |
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.17.
 
 ## Development server
