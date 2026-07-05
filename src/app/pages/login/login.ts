@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,7 +27,9 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  readonly busy = signal(false);
+  /** Fase del login en curso: distingue "esperando al proveedor" de "validando con la API". */
+  readonly phase = signal<'idle' | 'proveedor' | 'api'>('idle');
+  readonly busy = computed(() => this.phase() !== 'idle');
   readonly error = signal<string | null>(null);
 
   constructor() {
@@ -46,17 +48,18 @@ export class LoginComponent {
   }
 
   private async signIn(provider: Provider, getIdToken: () => Promise<string>): Promise<void> {
-    this.busy.set(true);
+    this.phase.set('proveedor');
     this.error.set(null);
     try {
       const idToken = await getIdToken();
+      this.phase.set('api');
       await this.auth.loginExternal(idToken, provider);
       await this.router.navigateByUrl(this.returnUrl());
     } catch (err) {
       // Cerrar el popup de MSAL no es un error a mostrar.
       if (!isUserCancelled(err)) this.error.set(this.describeError(err));
     } finally {
-      this.busy.set(false);
+      this.phase.set('idle');
     }
   }
 

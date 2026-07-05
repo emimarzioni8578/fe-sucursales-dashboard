@@ -111,6 +111,21 @@ describe('LoginComponent', () => {
     expect(navigateByUrl).not.toHaveBeenCalled();
   });
 
+  it('reports the provider phase while the popup is open and the API phase during the exchange', async () => {
+    const { cmp, auth, microsoft } = await create();
+    microsoft.acquireIdToken.mockImplementation(async () => {
+      expect(cmp.phase()).toBe('proveedor');
+      return 'ms-id-token';
+    });
+    auth.loginExternal.mockImplementation(async () => {
+      expect(cmp.phase()).toBe('api');
+    });
+
+    await cmp.loginWithMicrosoft();
+    expect(cmp.phase()).toBe('idle');
+    expect(cmp.busy()).toBe(false);
+  });
+
   it('MSAL failures (e.g. popup blocked) surface their message', async () => {
     const { cmp, microsoft } = await create();
     microsoft.acquireIdToken.mockRejectedValue(new Error('Popup bloqueado por el navegador'));

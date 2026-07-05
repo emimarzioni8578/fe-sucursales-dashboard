@@ -7,7 +7,7 @@
     @if (busy()) {
       <div class="busy">
         <mat-spinner diameter="36" />
-        <span>Validando con la API…</span>
+        <span>{{ phase() === 'api' ? 'Validando con la API…' : 'Esperando al proveedor… completá el login en la ventana emergente' }}</span>
       </div>
     } @else {
       <div class="providers">

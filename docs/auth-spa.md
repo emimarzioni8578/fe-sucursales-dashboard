@@ -25,7 +25,8 @@ propio de la API**, y a partir de ahí cada request a la API viaja con `Authoriz
 | [`auth/auth.guard.ts`](../src/app/auth/auth.guard.ts) | `canActivateChild` sobre el grupo de rutas del dashboard. Sin sesión → `/login?returnUrl=<destino>` (con filtros incluidos en la URL). |
 | [`auth/gsi-loader.ts`](../src/app/auth/gsi-loader.ts) | Inyecta el script de Google Identity Services una sola vez (promesa cacheada a nivel módulo). |
 | [`auth/google-button.ts`](../src/app/auth/google-button.ts) | Renderiza el botón de GIS y emite el `credential` (que **es** el ID token) por el output `idToken`. |
-| [`auth/microsoft-login.ts`](../src/app/auth/microsoft-login.ts) | `MicrosoftLoginService.acquireIdToken()`: popup de MSAL (authority `/common`, multi-tenant) y devuelve `result.idToken`. `@azure/msal-browser` se importa **on-demand** → chunk lazy propio que solo se baja al clickear el botón. |
+| [`auth/microsoft-login.ts`](../src/app/auth/microsoft-login.ts) | `MicrosoftLoginService.acquireIdToken()`: popup de MSAL (authority `/common`, multi-tenant) y devuelve `result.idToken`. `@azure/msal-browser` se importa **on-demand** → chunk lazy propio que solo se baja al clickear el botón. `redirectUri` = raíz de la SPA (ver `main.ts`). |
+| [`main.ts`](../src/main.ts) | Detecta si la URL trae una respuesta OAuth (`code`/`error` + `state` — el popup de MSAL volviendo) **antes** de bootstrapear Angular: en msal-browser **v5** el popup debe ejecutar `broadcastResponseToMainFrame()` (del subpath `@azure/msal-browser/redirect-bridge`) para devolverle la respuesta al opener por **BroadcastChannel** — el opener ya no mira el hash. Si en cambio booteara la app, el router pisaría el `#code=...` y el login quedaría esperando hasta el timeout. |
 | [`pages/login/`](../src/app/pages/login/) | La pantalla: ambos botones comparten un `signIn(provider, getIdToken)` común (busy, manejo de errores, `returnUrl`). |
 | [`environments/`](../src/environments/) | `apiBaseUrl` + los dos ClientIds. `environment.development.ts` reemplaza al de prod vía `fileReplacements`. |
 | [`proxy.conf.json`](../proxy.conf.json) | En dev, `/api` → `https://localhost:5001` (evita CORS; cableado en `angular.json` → serve). |
@@ -90,8 +91,17 @@ dotnet user-secrets set "ExternalAuth:Providers:microsoft:ClientId" "d49e6ae9-33
   con `http://localhost:4200` en **Authorized JavaScript origins** (GIS no usa redirect URI).
 - **Microsoft** ([runbook §2.2](runbook-spa-social-login.md)): App registration **multi-tenant**
   (alineado con el authority `/common` que usa `microsoft-login.ts` y la API), plataforma
-  **Single-page application** con redirect URI `http://localhost:4200`. Si el registro fuera
-  single-tenant, cambiar el authority en **ambos** lados al tenant específico.
+  **Single-page application** con redirect URI **`http://localhost:4200`** (la raíz; ídem con
+  la URL real en prod). Ojo: tiene que estar bajo la plataforma SPA, no "Web" — bajo Web el
+  canje cross-origin del code falla (`AADSTS9002326`). Si el registro fuera single-tenant,
+  cambiar el authority en **ambos** lados al tenant específico.
+
+  > Dos gotchas aprendidos acá: (1) con **msal-browser v5** la página de redirección debe
+  > correr el redirect-bridge (`broadcastResponseToMainFrame`) — lo resuelve `main.ts`
+  > detectando la respuesta OAuth en la URL; el snippet del runbook §5.5 asume MSAL ≤ 4.
+  > (2) Las **cuentas personales** de Microsoft (`login.live.com`) tardan **horas** en
+  > enterarse de redirect URIs nuevas — por eso se reusa la raíz ya registrada en vez de
+  > una ruta dedicada.
 
 ## Correr y probar end-to-end
 
@@ -111,6 +121,8 @@ dotnet user-secrets set "ExternalAuth:Providers:microsoft:ClientId" "d49e6ae9-33
 | "No se pudo contactar a la API" (status 0) | API caída o proxy apuntando mal (`proxy.conf.json`) |
 | El botón de Google no aparece / `origin_mismatch` | `http://localhost:4200` no está en los JavaScript origins (o no propagó aún) |
 | Popup de Microsoft bloqueado | Popup blocker: el login debe salir de un click directo |
+| El login de Microsoft "se queda esperando" (spinner en fase proveedor) y falla a los ~15s | El popup no ejecutó el redirect-bridge (la detección de `main.ts` no corrió). Verificar que el popup haya vuelto a la raíz de la SPA y que la URL del popup traiga `code=`/`state=`. |
+| `invalid_request ... redirect_uri is not valid` en el popup (host `login.live.com`) | La URI que manda la SPA no está registrada, o es nueva y el sistema de cuentas personales todavía no la propagó (tarda horas). La raíz `http://localhost:4200` ya registrada no sufre esto. |
 | 401 con `IDX10214` en el log de la API | Se mandó el access token de MS en vez del **ID token**, o ClientId desalineado |
 
 La tabla completa está en [runbook §7](runbook-spa-social-login.md).

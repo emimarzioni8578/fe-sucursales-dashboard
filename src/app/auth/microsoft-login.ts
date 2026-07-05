@@ -24,8 +24,16 @@ export class MicrosoftLoginService {
           // de la API. Si el registro fuera single-tenant, apuntar ambos lados al tenant
           // (ver nota de issuer en docs/authentication-guide.md).
           authority: 'https://login.microsoftonline.com/common',
+          // MSAL v5 exige que la página de redirección ejecute el redirect-bridge
+          // (BroadcastChannel hacia el opener); main.ts detecta la respuesta OAuth en la
+          // URL y corre el bridge ANTES de bootstrapear Angular. Se usa la raíz porque ya
+          // está registrada como URI SPA en Entra (y las cuentas personales de Microsoft
+          // propagan URIs nuevas con horas de demora).
           redirectUri: window.location.origin,
         },
+        // Si el popup no responde (URI mal registrada, bridge que no corre), cortar a
+        // los 15s (default 60s) para que el error se vea en vez de un spinner eterno.
+        system: { popupBridgeTimeout: 15000 },
       });
       await this.msal.initialize();
     }
