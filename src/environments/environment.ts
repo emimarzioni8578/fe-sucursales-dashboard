@@ -15,4 +15,9 @@ export const environment = {
    * `POST /auth/external` devuelve 401 (la API valida el `aud` del ID token).
    */
   googleClientId: '448134429780-fa19l1avvq9ro3trmd758acl54s4j4n7.apps.googleusercontent.com',
+  /**
+   * Application (client) ID del registro en Microsoft Entra ID. Igual que con Google,
+   * DEBE coincidir con `ExternalAuth:Providers:microsoft:ClientId` en la API.
+   */
+  microsoftClientId: 'd49e6ae9-330c-4d9f-8f0d-752dde68707a',
 };

@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router, convertToParamMap, provideRouter } from '@angular/router';
 import { AuthService } from '@auth/auth.service';
+import { MicrosoftLoginService } from '@auth/microsoft-login';
 import { LoginComponent } from './login';
 
 describe('LoginComponent', () => {
@@ -11,12 +12,14 @@ describe('LoginComponent', () => {
       isLoggedIn: () => opts.loggedIn ?? false,
       loginExternal: vi.fn<(idToken: string, provider: string) => Promise<void>>().mockResolvedValue(undefined),
     };
+    const microsoft = { acquireIdToken: vi.fn<() => Promise<string>>().mockResolvedValue('ms-id-token') };
     await TestBed.configureTestingModule({
       imports: [LoginComponent],
       providers: [
         provideNoopAnimations(),
         provideRouter([]),
         { provide: AuthService, useValue: auth },
+        { provide: MicrosoftLoginService, useValue: microsoft },
         {
           provide: ActivatedRoute,
           useValue: { snapshot: { queryParamMap: convertToParamMap(opts.returnUrl ? { returnUrl: opts.returnUrl } : {}) } },
@@ -26,7 +29,7 @@ describe('LoginComponent', () => {
 
     const navigateByUrl = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     const fixture = TestBed.createComponent(LoginComponent);
-    return { fixture, cmp: fixture.componentInstance, auth, navigateByUrl };
+    return { fixture, cmp: fixture.componentInstance, auth, microsoft, navigateByUrl };
   }
 
   it('creates and stays on the page while logged out', async () => {
@@ -82,6 +85,38 @@ describe('LoginComponent', () => {
 
     await cmp.onIdToken('tok');
     expect(cmp.error()).toBe('boom');
+  });
+
+  it('logs in with Microsoft exchanging the MSAL ID token', async () => {
+    const { cmp, auth, microsoft, navigateByUrl } = await create({ returnUrl: '/auditoria' });
+
+    await cmp.loginWithMicrosoft();
+
+    expect(microsoft.acquireIdToken).toHaveBeenCalledTimes(1);
+    expect(auth.loginExternal).toHaveBeenCalledWith('ms-id-token', 'microsoft');
+    expect(navigateByUrl).toHaveBeenCalledWith('/auditoria');
+    expect(cmp.error()).toBeNull();
+  });
+
+  it('closing the MSAL popup is not shown as an error', async () => {
+    const { cmp, auth, microsoft, navigateByUrl } = await create();
+    microsoft.acquireIdToken.mockRejectedValue(
+      Object.assign(new Error('User cancelled the flow.'), { errorCode: 'user_cancelled' }));
+
+    await cmp.loginWithMicrosoft();
+
+    expect(cmp.error()).toBeNull();
+    expect(cmp.busy()).toBe(false);
+    expect(auth.loginExternal).not.toHaveBeenCalled();
+    expect(navigateByUrl).not.toHaveBeenCalled();
+  });
+
+  it('MSAL failures (e.g. popup blocked) surface their message', async () => {
+    const { cmp, microsoft } = await create();
+    microsoft.acquireIdToken.mockRejectedValue(new Error('Popup bloqueado por el navegador'));
+
+    await cmp.loginWithMicrosoft();
+    expect(cmp.error()).toBe('Popup bloqueado por el navegador');
   });
 
   it('renders the error message in the template', async () => {

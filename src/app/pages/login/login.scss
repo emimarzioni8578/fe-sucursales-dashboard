@@ -9,6 +9,11 @@
   .subtitle { color: #666; font-size: 14px; margin: 0 0 12px; }
 }
 .busy { display: flex; flex-direction: column; align-items: center; gap: 12px; color: #666; }
+.providers { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.ms-button {
+  width: 280px;
+  .ms-logo { margin-right: 8px; vertical-align: -3px; flex-shrink: 0; }
+}
 .error {
   display: flex; align-items: flex-start; gap: 8px; margin: 8px 0 0;
   color: var(--mat-sys-error); font-size: 13px; text-align: left;

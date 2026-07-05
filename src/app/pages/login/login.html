@@ -2,7 +2,7 @@
   <div class="login-card">
     <mat-icon class="logo">storefront</mat-icon>
     <h1>Sucursales Dashboard</h1>
-    <p class="subtitle">Ingresá con tu cuenta de Google para continuar</p>
+    <p class="subtitle">Ingresá con tu cuenta de Google o Microsoft para continuar</p>
 
     @if (busy()) {
       <div class="busy">
@@ -10,7 +10,18 @@
         <span>Validando con la API…</span>
       </div>
     } @else {
-      <app-google-button (idToken)="onIdToken($event)" (loadError)="error.set($event)" />
+      <div class="providers">
+        <app-google-button (idToken)="onIdToken($event)" (loadError)="error.set($event)" />
+        <button mat-stroked-button type="button" class="ms-button" (click)="loginWithMicrosoft()">
+          <svg class="ms-logo" viewBox="0 0 21 21" width="18" height="18" aria-hidden="true">
+            <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+            <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+            <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+          </svg>
+          Continuar con Microsoft
+        </button>
+      </div>
     }
 
     @if (error(); as e) {

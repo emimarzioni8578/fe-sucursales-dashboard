@@ -1,24 +1,29 @@
 import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '@auth/auth.service';
 import { GoogleButtonComponent } from '@auth/google-button';
+import { MicrosoftLoginService } from '@auth/microsoft-login';
+
+type Provider = 'google' | 'microsoft';
 
 /**
- * Pantalla de login social: el botón de Google entrega el ID token y acá se lo
+ * Pantalla de login social: cada botón entrega el ID token de su proveedor y acá se lo
  * canjea contra `POST /auth/external` por el par access+refresh propio de la API.
  */
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [MatIconModule, MatProgressSpinnerModule, GoogleButtonComponent],
+  imports: [MatButtonModule, MatIconModule, MatProgressSpinnerModule, GoogleButtonComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
 export class LoginComponent {
   private readonly auth = inject(AuthService);
+  private readonly microsoft = inject(MicrosoftLoginService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -30,14 +35,26 @@ export class LoginComponent {
     if (this.auth.isLoggedIn()) void this.router.navigateByUrl(this.returnUrl());
   }
 
-  async onIdToken(idToken: string): Promise<void> {
+  /** El botón de Google (GIS) ya trae el ID token en su callback. */
+  onIdToken(idToken: string): Promise<void> {
+    return this.signIn('google', async () => idToken);
+  }
+
+  /** Con Microsoft el ID token se obtiene recién al abrir el popup de MSAL. */
+  loginWithMicrosoft(): Promise<void> {
+    return this.signIn('microsoft', () => this.microsoft.acquireIdToken());
+  }
+
+  private async signIn(provider: Provider, getIdToken: () => Promise<string>): Promise<void> {
     this.busy.set(true);
     this.error.set(null);
     try {
-      await this.auth.loginExternal(idToken, 'google');
+      const idToken = await getIdToken();
+      await this.auth.loginExternal(idToken, provider);
       await this.router.navigateByUrl(this.returnUrl());
     } catch (err) {
-      this.error.set(this.describeError(err));
+      // Cerrar el popup de MSAL no es un error a mostrar.
+      if (!isUserCancelled(err)) this.error.set(this.describeError(err));
     } finally {
       this.busy.set(false);
     }
@@ -52,7 +69,7 @@ export class LoginComponent {
   private describeError(err: unknown): string {
     if (err instanceof HttpErrorResponse) {
       if (err.status === 401) {
-        return 'La API rechazó el login (401). Verificá que el ClientId de Google esté configurado '
+        return 'La API rechazó el login (401). Verificá que el ClientId del proveedor esté configurado '
           + 'en la API y sea el mismo que usa esta SPA (ver docs/runbook-spa-social-login.md §7).';
       }
       if (err.status === 0) {
@@ -62,4 +79,10 @@ export class LoginComponent {
     }
     return err instanceof Error ? err.message : 'Ocurrió un error inesperado al iniciar sesión.';
   }
+}
+
+/** BrowserAuthError de MSAL cuando el usuario cierra el popup sin completar el login. */
+function isUserCancelled(err: unknown): boolean {
+  return typeof err === 'object' && err !== null
+    && (err as { errorCode?: string }).errorCode === 'user_cancelled';
 }
