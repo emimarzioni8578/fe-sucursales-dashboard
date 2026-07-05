@@ -1,6 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from '@auth/auth.service';
 import { DashboardSource } from '@services/dashboard-source';
 import { FilterUrlSyncService } from '@services/filter-url-sync';
 import { FilterBarComponent } from '@components/filter-bar/filter-bar';
@@ -27,10 +30,17 @@ export class AppComponent {
   private router = inject(Router);
   private dialog = inject(MatDialog);
   private filterUrlSync = inject(FilterUrlSyncService);
+  auth = inject(AuthService);
   data = inject(DashboardSource);
   state$ = this.data.state$;
   dark = signal(false);
   searchResults = signal<SucursalRow[]>([]);
+
+  // En /login el shell (toolbar, filtros, estado de datos) no aplica: se muestra solo la página.
+  private readonly url = toSignal(this.router.events.pipe(
+    filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+    map(e => e.urlAfterRedirects)), { initialValue: this.router.url });
+  readonly isLoginPage = computed(() => this.url().startsWith('/login'));
 
   onSearch(term: string): void {
     this.searchResults.set(this.data.searchSucursales(term, 8));
@@ -48,6 +58,11 @@ export class AppComponent {
   }
 
   reload(): void { this.data.reload(); }
+
+  logout(): void {
+    this.auth.logout();
+    void this.router.navigate(['/login']);
+  }
 
   toggleTheme(): void { this.setDark(!this.dark()); }
 

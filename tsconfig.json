@@ -16,6 +16,8 @@
     "module": "preserve",
     "baseUrl": ".",
     "paths": {
+      "@auth/*": ["src/app/auth/*"],
+      "@env/*": ["src/environments/*"],
       "@models/*": ["src/app/models/*"],
       "@services/*": ["src/app/services/*"],
       "@components/*": ["src/app/components/*"],

@@ -1,0 +1,23 @@
+<div class="login-page">
+  <div class="login-card">
+    <mat-icon class="logo">storefront</mat-icon>
+    <h1>Sucursales Dashboard</h1>
+    <p class="subtitle">Ingresá con tu cuenta de Google para continuar</p>
+
+    @if (busy()) {
+      <div class="busy">
+        <mat-spinner diameter="36" />
+        <span>Validando con la API…</span>
+      </div>
+    } @else {
+      <app-google-button (idToken)="onIdToken($event)" (loadError)="error.set($event)" />
+    }
+
+    @if (error(); as e) {
+      <p class="error" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ e }}</span>
+      </p>
+    }
+  </div>
+</div>
