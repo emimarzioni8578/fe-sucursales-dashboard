@@ -10,6 +10,7 @@
 | Gráficos | Chart.js 4 vía `ng2-charts` 10 |
 | Mapas | Leaflet 1.9 + `leaflet.heat` (heatmap) + `leaflet.markercluster` (clustering) |
 | Datos (origen actual) | CSVs estáticos en `src/assets/data`, parseados con `papaparse` |
+| Autenticación | Login social (Google Identity Services + MSAL) contra el JWT propio de la API — ver [auth-spa.md](auth-spa.md) |
 | Reactividad | RxJS 7.8 en la capa de datos; signals en la capa de vista |
 | Build / CLI | `@angular/build:application` (esbuild) |
 | Tests | Vitest 4 + jsdom (`@angular/build:unit-test`) |
@@ -177,12 +178,16 @@ Si cambia la grafía en el origen, se ajusta acá y el compilador marca todos lo
 
 ### Shell — [`app.ts`](../src/app/app.ts) / [`app.html`](../src/app/app.html)
 Toolbar con: título, **búsqueda global** de sucursales (autocomplete que abre el diálogo
-de detalle), navegación a las 8 páginas, y **toggle de tema** claro/oscuro (persistido en
-`localStorage`). El `<main>` hace `@switch` sobre `state$`: spinner (loading), mensaje +
-Reintentar (error), o `<app-filter-bar>` + `<router-outlet>` (ready).
+de detalle), navegación a las 8 páginas, **toggle de tema** claro/oscuro (persistido en
+`localStorage`) y **cerrar sesión** (visible con login activo). El `<main>` hace `@switch`
+sobre `state$`: spinner (loading), mensaje + Reintentar (error), o `<app-filter-bar>` +
+`<router-outlet>` (ready). En `/login` (`isLoginPage`) el shell se oculta por completo y
+solo se renderiza la página de login.
 
 ### Ruteo — [`app.routes.ts`](../src/app/app.routes.ts)
-Las 8 páginas se cargan con **lazy `loadComponent`**. `''` redirige a `resumen`.
+Las 8 páginas se cargan con **lazy `loadComponent`** dentro de un grupo protegido por
+`authGuard` (`canActivateChild`): sin sesión se redirige a `/login?returnUrl=...`
+(ver [auth-spa.md](auth-spa.md)). `''` redirige a `resumen`.
 
 ### Páginas — [`pages/`](../src/app/pages/)
 Patrón uniforme:
@@ -227,8 +232,14 @@ y navega a `/sucursales`.
 
 ## 9. Configuración de build y aliases
 
-- **Path aliases** (tsconfig): `@models/*`, `@services/*`, `@components/*`, `@shared/*`,
-  `@pages/*`, `@testing/*`. Los imports dentro de la misma carpeta quedan relativos.
+- **Path aliases** (tsconfig): `@auth/*`, `@env/*`, `@models/*`, `@services/*`,
+  `@components/*`, `@shared/*`, `@pages/*`, `@testing/*`. Los imports dentro de la misma
+  carpeta quedan relativos.
+- **Environments**: `src/environments/` (`apiBaseUrl` + ClientIds del login social);
+  `environment.development.ts` reemplaza al de prod vía `fileReplacements` en la
+  configuración development.
+- **Proxy dev**: `proxy.conf.json` manda `/api` → `https://localhost:5001` (la API), cableado
+  en el target `serve`.
 - **Assets**: `src/assets` → `assets/` (de ahí salen los CSVs). Si se agrega un CSV nuevo
   hay que dejarlo ahí; el `describeError` del servicio avisa si falta (404).
 - **CommonJS permitidos**: leaflet(+heat+markercluster) y papaparse.
@@ -241,6 +252,8 @@ Vitest + jsdom. Hay specs junto a cada unidad relevante:
 - Agregadores puros (`coords.spec.ts`, `csv-dashboard.service.spec.ts`, …).
 - Utilidades (`export.util.spec.ts`, `date-presets.util.spec.ts`).
 - Cada página testea sus `getX(d)` con datos mock.
+- La capa de auth completa y ambas implementaciones de `DashboardSource`
+  (ver [auth-spa.md — Testing](auth-spa.md)).
 - Helpers de test en [`testing/`](../src/app/testing/) (`mocks.ts`, `mock-chart.ts`).
 
 ```bash
@@ -261,7 +274,12 @@ define el contrato esperado del backend:
 Pasos para migrar:
 1. Implementar esos endpoints en el backend devolviendo exactamente esos shapes.
 2. En `app.config.ts` cambiar `useClass: CsvDashboardService` → `ApiDashboardService`.
-3. Mover `baseUrl` a `environment.ts`.
+3. Apuntar el `baseUrl` del stub a `environment.apiBaseUrl` (los environments ya existen desde
+   la integración del login; en dev el proxy ya manda `/api` a la API).
+
+La autenticación ya está resuelta: el `authInterceptor` agrega el Bearer a todo request cuya URL
+empiece con `environment.apiBaseUrl`, así que los endpoints del dashboard quedarían autenticados
+sin ningún cambio adicional (ver [auth-spa.md](auth-spa.md)).
 
 La UI, las páginas, el filtro y los gráficos **no cambian**: siguen consumiendo
 `DashboardData` a través de `DashboardSource`. La agregación cliente (`aggregations/`)
