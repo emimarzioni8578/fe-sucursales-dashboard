@@ -41,4 +41,18 @@ describe('SucursalDetailDialog', () => {
     expect(text).toContain('7');
     expect(text).toContain('17');
   });
+
+  it('shows the Google-style rating with average and vote count', async () => {
+    await setup({ ratingAverage: 3.8, ratingCount: 21 });
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('3.8');
+    expect(text).toContain('(21)');
+    expect(text).toContain('★★★★★');
+  });
+
+  it('shows "Sin calificaciones" when the branch has no votes', async () => {
+    await setup({ ratingAverage: null, ratingCount: 0 });
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Sin calificaciones');
+  });
 });

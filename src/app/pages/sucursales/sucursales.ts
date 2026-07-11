@@ -14,6 +14,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DashboardSource } from '@services/dashboard-source';
 import { exportToCsv } from '@services/export.util';
 import { SucursalDetailDialog } from '@components/sucursal-detail/sucursal-detail';
+import { RatingStarsComponent } from '@components/rating-stars/rating-stars';
 import type { SucursalRow } from '@models/data-models.model';
 
 @Component({
@@ -22,6 +23,7 @@ import type { SucursalRow } from '@models/data-models.model';
   imports: [
     AsyncPipe, MatCardModule, MatTableModule, MatSortModule, MatPaginatorModule,
     MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule, MatChipsModule,
+    RatingStarsComponent,
   ],
   templateUrl: './sucursales.html',
   styleUrl: './sucursales.scss',
@@ -32,7 +34,7 @@ export class SucursalesComponent {
   activeFilter$ = this.data.activeFilter$;
 
   dataSource = new MatTableDataSource<SucursalRow>([]);
-  displayedColumns = ['id', 'nombre', 'provincia', 'localidad', 'estado', 'compAbiertas', 'mailsFallidos', 'riesgo'];
+  displayedColumns = ['id', 'nombre', 'provincia', 'localidad', 'estado', 'ratingAverage', 'compAbiertas', 'mailsFallidos', 'riesgo'];
 
   @ViewChild(MatSort) set sortSetter(s: MatSort | undefined) { if (s) this.dataSource.sort = s; }
   @ViewChild(MatPaginator) set paginatorSetter(p: MatPaginator | undefined) { if (p) this.dataSource.paginator = p; }
@@ -61,6 +63,7 @@ export class SucursalesComponent {
       { key: 'id', header: 'ID' }, { key: 'nombre', header: 'Sucursal' },
       { key: 'provincia', header: 'Provincia' }, { key: 'region', header: 'Región' },
       { key: 'localidad', header: 'Localidad' }, { key: 'estado', header: 'Estado' },
+      { key: 'ratingAverage', header: 'Calificación' }, { key: 'ratingCount', header: 'Votos' },
       { key: 'email', header: 'Email' }, { key: 'telefono', header: 'Teléfono' },
       { key: 'compAbiertas', header: 'Comp Abiertas' }, { key: 'compTotal', header: 'Comp Totales' },
       { key: 'mailsFallidos', header: 'Mails Fallidos' }, { key: 'riesgo', header: 'Riesgo' },

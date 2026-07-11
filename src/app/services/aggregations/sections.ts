@@ -2,8 +2,9 @@ import type {
   DashboardData, ProvinciaData, SucursalGeo, SucursalIssue,
   CompMes, MailMes, AperturaMes, AuditMes, AuditTabla, DashboardTrends,
 } from '@models/data-models.model';
-import { EstadoSucursal, CompEstado, MailEstado, MonitoringAccion, isFlag } from '@models/domain.constants';
+import { EstadoSucursal, CompEstado, MailEstado, MonitoringAccion, RATING_BAJO, isFlag } from '@models/domain.constants';
 import { classifyCoord, hasCoordText } from './coords';
+import { buildRatingHistogram, ratingAverage, type RatingAggregate } from './ratings';
 import type { Lookups } from './lookups';
 import type { FilteredData } from './filter';
 
@@ -159,6 +160,7 @@ export function computeAuditoria(fd: FilteredData, lk: Lookups): Auditoria {
 export function computeGeo(
   fd: FilteredData, lk: Lookups,
   compAbiertasBySuc: Map<string, number>, mailsFallidosBySuc: Map<string, number>,
+  ratingBySuc: Map<string, RatingAggregate>,
 ): Pick<DashboardData, 'sucursalesGeo' | 'coordsInvalidas'> {
   let coordsInvalidas = 0;
   const sucursalesGeo: SucursalGeo[] = [];
@@ -168,6 +170,7 @@ export function computeGeo(
     if (coord.coordInvalida) coordsInvalidas++;
     const ca = compAbiertasBySuc.get(s.SucursalId) || 0;
     const mf = mailsFallidosBySuc.get(s.SucursalId) || 0;
+    const rating = ratingBySuc.get(s.SucursalId) || { sum: 0, count: 0 };
     sucursalesGeo.push({
       id: s.SucursalId, nombre: s.NombreSucursal, lat: coord.lat!, lng: coord.lng!,
       estado: lk.estado.get(s.EstadoSucursalId) || 'Desconocido',
@@ -176,9 +179,33 @@ export function computeGeo(
       compAbiertas: ca, mailsFallidos: mf,
       riesgo: ca * 2 + mf + (isFlag(s.IsDeleted) ? 5 : 0),
       coordValida: coord.coordValida,
+      ratingAverage: ratingAverage(rating.sum, rating.count), ratingCount: rating.count,
     });
   });
   return { sucursalesGeo, coordsInvalidas };
+}
+
+type Ratings = Pick<DashboardData,
+  'ratingPromedioRed' | 'ratingVotos' | 'sucCalificadas' | 'pctCalificadas' | 'ratingBajas' | 'ratingDistribucion'
+>;
+
+/** Scoring agregado de la red: promedio exacto sobre todos los votos, cobertura e histograma. */
+export function computeRatings(fd: FilteredData, ratingBySuc: Map<string, RatingAggregate>): Ratings {
+  let sum = 0, count = 0, ratingBajas = 0;
+  ratingBySuc.forEach(agg => {
+    sum += agg.sum;
+    count += agg.count;
+    const avg = ratingAverage(agg.sum, agg.count);
+    if (avg !== null && avg < RATING_BAJO) ratingBajas++;
+  });
+  return {
+    ratingPromedioRed: ratingAverage(sum, count),
+    ratingVotos: count,
+    sucCalificadas: ratingBySuc.size,
+    pctCalificadas: pct(ratingBySuc.size, fd.sucursales.length),
+    ratingBajas,
+    ratingDistribucion: buildRatingHistogram(fd.ratings),
+  };
 }
 
 export function computeIssues(fd: FilteredData, lk: Lookups): Pick<DashboardData, 'sucursalesConProblemas'> {
@@ -206,9 +233,12 @@ interface ProvAccum {
   total: number; activas: number; inactivas: number; pendientes: number;
   sinCoord: number; conDist: Set<string>; conSocial: Set<string>;
   compTotal: number; compAbiertas: number; mailsTotal: number; mailsFallidos: number;
+  ratingSum: number; ratingVotos: number; sucCalificadas: number;
 }
 
-export function computeProvincias(fd: FilteredData, lk: Lookups): Pick<DashboardData, 'provincias'> {
+export function computeProvincias(
+  fd: FilteredData, lk: Lookups, ratingBySuc: Map<string, RatingAggregate>,
+): Pick<DashboardData, 'provincias'> {
   const { sucursales, sucDist, sucSocial, compReqs, mails } = fd;
   const acc = new Map<string, ProvAccum>();
   lk.provincia.forEach((nombre, id) => {
@@ -217,6 +247,7 @@ export function computeProvincias(fd: FilteredData, lk: Lookups): Pick<Dashboard
       total: 0, activas: 0, inactivas: 0, pendientes: 0,
       sinCoord: 0, conDist: new Set(), conSocial: new Set(),
       compTotal: 0, compAbiertas: 0, mailsTotal: 0, mailsFallidos: 0,
+      ratingSum: 0, ratingVotos: 0, sucCalificadas: 0,
     });
   });
 
@@ -243,6 +274,10 @@ export function computeProvincias(fd: FilteredData, lk: Lookups): Pick<Dashboard
     const d = acc.get(lk.sucProvincia.get(m.SucursalId)!); if (!d) return;
     d.mailsTotal++; if (lk.mailState.get(m.MailStateId) === MailEstado.Failed) d.mailsFallidos++;
   });
+  ratingBySuc.forEach((agg, sid) => {
+    const d = acc.get(lk.sucProvincia.get(sid)!); if (!d) return;
+    d.ratingSum += agg.sum; d.ratingVotos += agg.count; d.sucCalificadas++;
+  });
 
   const provincias: ProvinciaData[] = [];
   acc.forEach((d, provinciaId) => {
@@ -256,6 +291,8 @@ export function computeProvincias(fd: FilteredData, lk: Lookups): Pick<Dashboard
       pctCoberturaSocial: pct(d.conSocial.size, d.total),
       compAbiertas: d.compAbiertas, compTotal: d.compTotal,
       mailsTotal: d.mailsTotal, mailsFallidos: d.mailsFallidos, pctMailsFallidos: pct(d.mailsFallidos, d.mailsTotal),
+      ratingAverage: ratingAverage(d.ratingSum, d.ratingVotos), ratingVotos: d.ratingVotos,
+      sucCalificadas: d.sucCalificadas, pctCalificadas: pct(d.sucCalificadas, d.total),
     });
   });
   provincias.sort((a, b) => a.nombre.localeCompare(b.nombre));

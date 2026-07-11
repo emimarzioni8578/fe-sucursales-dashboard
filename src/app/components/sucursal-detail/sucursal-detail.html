@@ -1,5 +1,9 @@
 <h2 mat-dialog-title>{{ s.nombre }}</h2>
 <mat-dialog-content>
+  <div class="rating-row">
+    <app-rating-stars [average]="s.ratingAverage" [count]="s.ratingCount" />
+  </div>
+
   <div class="badges">
     <mat-chip>{{ s.estado }}</mat-chip>
     @if (s.isDeleted) { <mat-chip class="bad">Eliminada</mat-chip> }

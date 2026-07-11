@@ -1,6 +1,6 @@
 import type {
   Sucursal, CompensationRequest, CompensationRequestError, Mail,
-  SucursalDistribuidor, SucursalSocialNetwork, Monitoring, SucursalRow,
+  SucursalDistribuidor, SucursalSocialNetwork, SucursalRating, Monitoring, SucursalRow,
 } from '@models/data-models.model';
 import { isFlag } from '@models/domain.constants';
 import type { Lookups, RawData } from './lookups';
@@ -34,6 +34,7 @@ export interface FilteredData {
   mails: Mail[];
   sucDist: SucursalDistribuidor[];
   sucSocial: SucursalSocialNetwork[];
+  ratings: SucursalRating[];
   monitoring: Monitoring[];
 }
 
@@ -65,9 +66,11 @@ export function applyFilter(r: RawData, lk: Lookups, f: DashboardFilter): Filter
   const mails = r.mails.filter(m => incSet.has(m.SucursalId) && inRange(m.CreatedAt, f));
   const sucDist = r.sucDist.filter(d => incSet.has(d.SucursalId));
   const sucSocial = r.sucSocial.filter(s => incSet.has(s.SucursalId));
+  // Los ratings son estado vigente (como distribuidores/redes): no los acota la fecha.
+  const ratings = r.ratings.filter(rt => incSet.has(rt.SucursalId));
   // La auditoría no tiene SucursalId: es global salvo por fecha.
   const monitoring = r.monitoring.filter(m => inRange(m.CreatedAt, f));
-  return { sucursales, incSet, compReqs, compErrors, mails, sucDist, sucSocial, monitoring };
+  return { sucursales, incSet, compReqs, compErrors, mails, sucDist, sucSocial, ratings, monitoring };
 }
 
 /** Filtra filas de detalle ya construidas (`SucursalRow`) por provincia/region/estado. */

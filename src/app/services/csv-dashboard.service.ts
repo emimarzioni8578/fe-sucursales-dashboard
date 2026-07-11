@@ -95,6 +95,7 @@ export class CsvDashboardService extends DashboardSource {
       distribuidores: this.loadCsv<RawData['distribuidores'][number]>('distribuidores.csv'),
       sucDist: this.loadCsv<RawData['sucDist'][number]>('sucursal_distribuidores.csv'),
       sucSocial: this.loadCsv<RawData['sucSocial'][number]>('sucursal_social_networks.csv'),
+      ratings: this.loadCsv<RawData['ratings'][number]>('sucursal_ratings.csv'),
       estados: this.loadCsv<RawData['estados'][number]>('estado_sucursal.csv'),
       compReqs: this.loadCsv<RawData['compReqs'][number]>('compensation_requests.csv'),
       compStates: this.loadCsv<RawData['compStates'][number]>('compensation_request_states.csv'),

@@ -7,8 +7,9 @@ import type { DashboardData } from '@models/data-models.model';
 
 const FILES = [
   'sucursales', 'provincias', 'localidades', 'distribuidores', 'sucursal_distribuidores',
-  'sucursal_social_networks', 'estado_sucursal', 'compensation_requests', 'compensation_request_states',
-  'compensation_request_errors', 'errors', 'mails', 'mail_states', 'monitoring', 'monitoring_actions',
+  'sucursal_social_networks', 'sucursal_ratings', 'estado_sucursal', 'compensation_requests',
+  'compensation_request_states', 'compensation_request_errors', 'errors', 'mails', 'mail_states',
+  'monitoring', 'monitoring_actions',
 ];
 
 function daysAgo(n: number): string {
@@ -41,6 +42,12 @@ SD1,S1,D1,1
 SD2,S5,D1,0`,
     sucursal_social_networks: `SucursalSocialNetworkId,SucursalId,SocialNetworkId
 SSN1,S1,1`,
+    // S1: (5+4+4)/3 = 4.333… → 4.3 · S2: un solo voto · el resto queda sin calificar (null)
+    sucursal_ratings: `SucursalRatingId,SucursalId,UserId,Score,CreatedAt,UpdatedAt
+R1,S1,U1,5,2026-01-05,2026-01-05
+R2,S1,U2,4,2026-02-06,2026-02-06
+R3,S1,U3,4,2026-03-07,2026-03-07
+R4,S2,U1,2,2026-04-08,2026-04-08`,
     compensation_requests: `CompensationRequestId,SucursalId,UserId,CompensationRequestStateId,IsOpen,CreatedAt,ErrorId
 C1,S1,U1,1,1,${daysAgo(3)},E1
 C2,S1,U1,1,1,${daysAgo(15)},E2
@@ -203,6 +210,43 @@ describe('CsvDashboardService', () => {
   it('lists branches with data-quality issues only', () => {
     const ids = load().current.sucursalesConProblemas.map(s => s.id).sort();
     expect(ids).toEqual(['S2', 'S3', 'S4', 'S5']); // S1 is fully complete
+  });
+
+  it('aggregates network-level scoring: exact average, coverage, low ratings and histogram', () => {
+    const d = load().current;
+    expect(d.ratingPromedioRed).toBe(3.8); // (5+4+4+2)/4 = 3.75 → away-from-zero
+    expect(d.ratingVotos).toBe(4);
+    expect(d.sucCalificadas).toBe(2);      // S1 y S2
+    expect(d.pctCalificadas).toBe(40);     // 2 de 5
+    expect(d.ratingBajas).toBe(1);         // S2 con promedio 2
+    expect(d.ratingDistribucion).toEqual([0, 1, 0, 2, 1]); // 1★..5★
+  });
+
+  it('computes per-provincia rating from exact sums (not average of averages)', () => {
+    const d = load().current;
+    const ba = d.provincias.find(p => p.nombre === 'Buenos Aires')!; // S1,S2,S5
+    expect(ba.ratingAverage).toBe(3.8); // (13+2)/4
+    expect(ba.ratingVotos).toBe(4);
+    expect(ba.sucCalificadas).toBe(2);
+    expect(ba.pctCalificadas).toBe(66.7);
+    const cba = d.provincias.find(p => p.nombre === 'Cordoba')!; // S3,S4 sin votos
+    expect(cba.ratingAverage).toBeNull();
+    expect(cba.ratingVotos).toBe(0);
+  });
+
+  it('enriches branch rows and geo points with the derived rating (backend rule)', () => {
+    const d = load().current;
+    const s1 = d.sucursales.find(s => s.id === 'S1')!;
+    expect(s1.ratingAverage).toBe(4.3); // (5+4+4)/3 = 4.333… → 1 decimal
+    expect(s1.ratingCount).toBe(3);
+
+    const s3 = d.sucursales.find(s => s.id === 'S3')!;
+    expect(s3.ratingAverage).toBeNull(); // sin votos ≠ 0 estrellas
+    expect(s3.ratingCount).toBe(0);
+
+    const geoS1 = d.sucursalesGeo.find(g => g.id === 'S1')!;
+    expect(geoS1.ratingAverage).toBe(4.3);
+    expect(geoS1.ratingCount).toBe(3);
   });
 
   it('builds full per-branch rows with intrinsic aggregates and risk', () => {

@@ -13,6 +13,7 @@ export const routes: Routes = [
       { path: 'territorial', loadComponent: () => import('./pages/operacion-territorial/operacion-territorial').then(m => m.OperacionTerritorialComponent) },
       { path: 'mapa', loadComponent: () => import('./pages/mapa/mapa').then(m => m.MapaComponent) },
       { path: 'sucursales', loadComponent: () => import('./pages/sucursales/sucursales').then(m => m.SucursalesComponent) },
+      { path: 'calificaciones', loadComponent: () => import('./pages/calificaciones/calificaciones').then(m => m.CalificacionesComponent) },
       { path: 'riesgo', loadComponent: () => import('./pages/riesgo-compensaciones/riesgo-compensaciones').then(m => m.RiesgoCompensacionesComponent) },
       { path: 'emails', loadComponent: () => import('./pages/emails-verificacion/emails-verificacion').then(m => m.EmailsVerificacionComponent) },
       { path: 'auditoria', loadComponent: () => import('./pages/auditoria-cambios/auditoria-cambios').then(m => m.AuditoriaCambiosComponent) },

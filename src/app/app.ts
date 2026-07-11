@@ -84,6 +84,7 @@ export class AppComponent {
     { path: 'territorial', icon: 'map', label: 'Territorial' },
     { path: 'mapa', icon: 'public', label: 'Mapa' },
     { path: 'sucursales', icon: 'store', label: 'Sucursales' },
+    { path: 'calificaciones', icon: 'star', label: 'Calificaciones' },
     { path: 'riesgo', icon: 'warning', label: 'Riesgo' },
     { path: 'emails', icon: 'email', label: 'Emails' },
     { path: 'auditoria', icon: 'history', label: 'Auditoría' },

@@ -20,6 +20,15 @@ export interface SucursalDistribuidor {
 export interface SucursalSocialNetwork {
   SucursalSocialNetworkId: string; SucursalId: string; SocialNetworkId: string;
 }
+/**
+ * Calificación 1–5 de un usuario a una sucursal (espejo de `SucursalRating` del backend).
+ * Una fila vigente por (SucursalId, UserId): re-votar reemplaza; retirar el voto borra la fila
+ * (no hay IsDeleted). El promedio nunca viene persistido: se deriva de estas filas.
+ */
+export interface SucursalRating {
+  SucursalRatingId: string; SucursalId: string; UserId: string; Score: string;
+  CreatedAt: string; UpdatedAt: string;
+}
 export interface EstadoSucursal {
   EstadoSucursalId: string; NombreEstadoSucursal: string;
 }
@@ -60,6 +69,10 @@ export interface ProvinciaData {
   pctActivas: number; pctCoberturaDist: number; pctCoberturaSocial: number;
   compAbiertas: number; compTotal: number;
   mailsTotal: number; mailsFallidos: number; pctMailsFallidos: number;
+  /** Promedio provincial exacto (suma/votos de la provincia, regla del backend); null sin votos. */
+  ratingAverage: number | null;
+  ratingVotos: number;
+  sucCalificadas: number; pctCalificadas: number;
 }
 export interface CompMes { mes: string; total: number; abiertas: number; }
 export interface MailMes { mes: string; total: number; fallidos: number; }
@@ -78,6 +91,9 @@ export interface SucursalGeo {
   estado: string; provincia: string; region: string;
   compAbiertas: number; mailsFallidos: number; riesgo: number;
   coordValida: boolean;
+  /** Promedio 1 decimal (regla del backend); null = sin votos ("sin calificar" ≠ 1 estrella). */
+  ratingAverage: number | null;
+  ratingCount: number;
 }
 export interface SucursalIssue {
   id: string; nombre: string; provincia: string; estado: string;
@@ -93,6 +109,9 @@ export interface SucursalRow {
   tieneDist: boolean; tieneSocial: boolean;
   compTotal: number; compAbiertas: number; mailsTotal: number; mailsFallidos: number;
   riesgo: number; isDeleted: boolean;
+  /** Promedio 1 decimal (regla del backend); null = sin votos ("sin calificar" ≠ 1 estrella). */
+  ratingAverage: number | null;
+  ratingCount: number;
 }
 export interface DashboardData {
   loading: boolean;
@@ -109,6 +128,14 @@ export interface DashboardData {
   softDeletes: number; bulkInserts: number; bulkUpdates: number;
   scoreRiesgo: number; sinRedSocial: number; sinDistribuidor: number; sinCoordenadas: number;
   pctSinSocial: number; pctSinDist: number; pctSinCoord: number;
+  /** Scoring de la red: promedio exacto sobre TODOS los votos (no promedio de promedios). */
+  ratingPromedioRed: number | null;
+  ratingVotos: number;
+  sucCalificadas: number; pctCalificadas: number;
+  /** Sucursales calificadas con promedio < RATING_BAJO. */
+  ratingBajas: number;
+  /** Histograma de votos vigentes: índice 0 = 1★ … 4 = 5★. */
+  ratingDistribucion: number[];
   provincias: ProvinciaData[];
   compPorMes: CompMes[];
   mailsPorMes: MailMes[];

@@ -1,0 +1,132 @@
+@if (d(); as d) {
+  <div class="page-head">
+    <div>
+      <h1>Calificaciones</h1>
+      <p class="subtitle">Scoring de sucursales (1–5 estrellas): ranking, distribución y análisis territorial</p>
+    </div>
+    <button mat-stroked-button (click)="exportar()">
+      <mat-icon>download</mat-icon> Exportar CSV
+    </button>
+  </div>
+
+  <div class="kpi-row">
+    <app-kpi-card label="Promedio de la Red" [value]="d.ratingPromedioRed !== null ? d.ratingPromedioRed + ' ★' : '—'"
+                  [sub]="d.ratingVotos + ' votos vigentes'" color="orange" />
+    <app-kpi-card label="Sucursales Calificadas" [value]="d.sucCalificadas"
+                  [sub]="d.pctCalificadas + '% de ' + d.totalSucursales" color="blue" />
+    <app-kpi-card label="Sin Calificar" [value]="sinCalificar()" sub="Todavía sin votos" color="teal" />
+    <app-kpi-card label="Rating Bajo" [value]="d.ratingBajas" [sub]="'Promedio menor a ' + ratingBajo + '★'" color="red" />
+  </div>
+
+  <div class="chart-row">
+    <mat-card class="chart-card">
+      <mat-card-header><mat-card-title>Distribución de votos</mat-card-title></mat-card-header>
+      <mat-card-content><div class="chart-box"><canvas baseChart [data]="distribucionData()" [type]="barType" [options]="histOptions"></canvas></div></mat-card-content>
+    </mat-card>
+    <mat-card class="chart-card">
+      <mat-card-header><mat-card-title>Promedio por provincia</mat-card-title></mat-card-header>
+      <mat-card-content><div class="chart-box tall"><canvas baseChart [data]="provinciaData()" [type]="barType" [options]="provOptions"></canvas></div></mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="rank-grid">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title><mat-icon class="title-icon good">thumb_up</mat-icon> Mejores sucursales</mat-card-title>
+        <mat-card-subtitle>Top 10 con al menos {{ minVotos }} votos</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @for (s of top(); track s.id; let i = $index) {
+          <div class="rank-row clickable" (click)="openDetail(s)">
+            <span class="pos">{{ i + 1 }}</span>
+            <div class="who">
+              <strong>{{ s.nombre }}</strong>
+              <span class="where">{{ s.provincia }} · {{ s.localidad }}</span>
+            </div>
+            <app-rating-stars [average]="s.ratingAverage" [count]="s.ratingCount" />
+          </div>
+        } @empty { <p class="empty">Ninguna sucursal alcanza los {{ minVotos }} votos mínimos.</p> }
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title><mat-icon class="title-icon bad">thumb_down</mat-icon> Peores sucursales</mat-card-title>
+        <mat-card-subtitle>Bottom 10 con al menos {{ minVotos }} votos</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        @for (s of bottom(); track s.id; let i = $index) {
+          <div class="rank-row clickable" (click)="openDetail(s)">
+            <span class="pos">{{ i + 1 }}</span>
+            <div class="who">
+              <strong>{{ s.nombre }}</strong>
+              <span class="where">{{ s.provincia }} · {{ s.localidad }}</span>
+            </div>
+            <app-rating-stars [average]="s.ratingAverage" [count]="s.ratingCount" />
+          </div>
+        } @empty { <p class="empty">Ninguna sucursal alcanza los {{ minVotos }} votos mínimos.</p> }
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card class="criticas-card">
+    <mat-card-header>
+      <mat-card-title><mat-icon class="title-icon bad">priority_high</mat-icon> Críticas: mala experiencia + riesgo operativo</mat-card-title>
+      <mat-card-subtitle>Rating menor a {{ ratingBajo }}★ y score de riesgo positivo — candidatas a intervención</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      @for (s of criticas(); track s.id) {
+        <div class="rank-row clickable" (click)="openDetail(s)">
+          <div class="who">
+            <strong>{{ s.nombre }}</strong>
+            <span class="where">{{ s.provincia }} · {{ s.localidad }}</span>
+          </div>
+          <app-rating-stars [average]="s.ratingAverage" [count]="s.ratingCount" />
+          <mat-chip class="riesgo-chip">Riesgo {{ s.riesgo }}</mat-chip>
+        </div>
+      } @empty { <p class="empty">Sin sucursales críticas: ninguna combina rating bajo con riesgo operativo.</p> }
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header><mat-card-title>Detalle por provincia</mat-card-title></mat-card-header>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort>
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Provincia</th>
+            <td mat-cell *matCellDef="let p"><strong>{{ p.nombre }}</strong></td>
+          </ng-container>
+          <ng-container matColumnDef="region">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Región</th>
+            <td mat-cell *matCellDef="let p"><mat-chip>{{ p.region }}</mat-chip></td>
+          </ng-container>
+          <ng-container matColumnDef="ratingAverage">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Calificación</th>
+            <td mat-cell *matCellDef="let p"><app-rating-stars [average]="p.ratingAverage" [count]="p.ratingVotos" /></td>
+          </ng-container>
+          <ng-container matColumnDef="ratingVotos">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Votos</th>
+            <td mat-cell *matCellDef="let p">{{ p.ratingVotos }}</td>
+          </ng-container>
+          <ng-container matColumnDef="sucCalificadas">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Calificadas</th>
+            <td mat-cell *matCellDef="let p">{{ p.sucCalificadas }} / {{ p.total }} ({{ p.pctCalificadas }}%)</td>
+          </ng-container>
+          <ng-container matColumnDef="delta">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Δ vs Red</th>
+            <td mat-cell *matCellDef="let p">
+              @if (deltaRed(p); as delta) {
+                <span class="delta" [class.up]="delta > 0" [class.down]="delta < 0">
+                  {{ delta > 0 ? '▲' : (delta < 0 ? '▼' : '▬') }} {{ delta > 0 ? '+' + delta : delta }}
+                </span>
+              } @else { <span class="delta flat">▬ 0</span> }
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

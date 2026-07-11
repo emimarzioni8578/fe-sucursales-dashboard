@@ -1,9 +1,10 @@
 import type { DashboardData, SucursalRow } from '@models/data-models.model';
 import type { Lookups, RawData } from './lookups';
 import { applyFilter, rowMatches, type DashboardFilter } from './filter';
+import { buildRatingIndex } from './ratings';
 import {
   pct, computeBranchSummary, computeCompensaciones, computeMails, computeAuditoria,
-  computeGeo, computeIssues, computeProvincias, computeSeries, computeErroresPorTipo,
+  computeGeo, computeIssues, computeProvincias, computeRatings, computeSeries, computeErroresPorTipo,
 } from './sections';
 
 /**
@@ -16,13 +17,15 @@ export function computeDashboard(
 ): DashboardData {
   const fd = applyFilter(r, lk, f);
 
+  const ratingBySuc = buildRatingIndex(fd.ratings);
   const branch = computeBranchSummary(fd, lk);
   const comp = computeCompensaciones(fd, lk);
   const mail = computeMails(fd, lk);
   const audit = computeAuditoria(fd, lk);
-  const geo = computeGeo(fd, lk, comp.compAbiertasBySuc, mail.mailsFallidosBySuc);
+  const geo = computeGeo(fd, lk, comp.compAbiertasBySuc, mail.mailsFallidosBySuc, ratingBySuc);
   const issues = computeIssues(fd, lk);
-  const { provincias } = computeProvincias(fd, lk);
+  const { provincias } = computeProvincias(fd, lk, ratingBySuc);
+  const ratings = computeRatings(fd, ratingBySuc);
   const series = computeSeries(fd, lk);
   const errores = computeErroresPorTipo(fd, lk);
 
@@ -57,6 +60,10 @@ export function computeDashboard(
     pctSinSocial: pct(sinRedSocial, branch.totalSucursales),
     pctSinDist: pct(sinDistribuidor, branch.totalSucursales),
     pctSinCoord: pct(sinCoordenadas, branch.totalSucursales),
+
+    ratingPromedioRed: ratings.ratingPromedioRed, ratingVotos: ratings.ratingVotos,
+    sucCalificadas: ratings.sucCalificadas, pctCalificadas: ratings.pctCalificadas,
+    ratingBajas: ratings.ratingBajas, ratingDistribucion: ratings.ratingDistribucion,
 
     provincias,
     compPorMes: series.compPorMes, mailsPorMes: series.mailsPorMes,

@@ -12,6 +12,7 @@ export function makeSucursalRow(partial: Partial<SucursalRow> = {}): SucursalRow
     tieneDist: true, tieneSocial: true,
     compTotal: 2, compAbiertas: 1, mailsTotal: 2, mailsFallidos: 1,
     riesgo: 3, isDeleted: false,
+    ratingAverage: 4.3, ratingCount: 12,
     ...partial,
   };
 }
@@ -23,6 +24,7 @@ export function makeProvinciaData(partial: Partial<ProvinciaData> = {}): Provinc
     sinSocial: 1, sinDist: 1, conDistCount: 2, conSocialCount: 2,
     pctActivas: 66.7, pctCoberturaDist: 66.7, pctCoberturaSocial: 66.7,
     compAbiertas: 1, compTotal: 2, mailsTotal: 2, mailsFallidos: 1, pctMailsFallidos: 50,
+    ratingAverage: 4.1, ratingVotos: 20, sucCalificadas: 2, pctCalificadas: 66.7,
     ...partial,
   };
 }
@@ -39,6 +41,8 @@ export function makeDashboardData(partial: Partial<DashboardData> = {}): Dashboa
     totalEventos: 3, inserciones: 2, actualizaciones: 1, softDeletes: 0, bulkInserts: 0, bulkUpdates: 0,
     scoreRiesgo: 54, sinRedSocial: 4, sinDistribuidor: 3, sinCoordenadas: 1,
     pctSinSocial: 80, pctSinDist: 60, pctSinCoord: 20,
+    ratingPromedioRed: 4.2, ratingVotos: 24, sucCalificadas: 4, pctCalificadas: 80,
+    ratingBajas: 1, ratingDistribucion: [1, 2, 3, 8, 10],
     provincias: [makeProvinciaData(), makeProvinciaData({ provinciaId: 'P2', nombre: 'Cordoba', region: 'Centro', total: 2 })],
     compPorMes: [{ mes: '2024-01', total: 2, abiertas: 1 }, { mes: '2024-02', total: 3, abiertas: 2 }],
     mailsPorMes: [{ mes: '2024-01', total: 5, fallidos: 1 }, { mes: '2024-02', total: 4, fallidos: 2 }],

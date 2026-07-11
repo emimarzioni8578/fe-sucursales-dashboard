@@ -40,6 +40,9 @@ export const COMP_ESTADO_COLORS = [PALETTE.orange, PALETTE.blue, PALETTE.green, 
 /** Colores rotativos para barras de errores por tipo. */
 export const ERROR_TIPO_COLORS = [PALETTE.blue, PALETTE.purple, PALETTE.orange];
 
+/** Un solo tono para las barras de scoring (el trabajo es magnitud, no identidad de serie). */
+export const RATING_SERIES_COLOR = PALETTE.orange;
+
 /** Colores de las acciones de auditoría, alineados con AUDIT_ACTIONS. */
 export const AUDIT_ACTION_COLORS = [
   PALETTE.green, PALETTE.orange, PALETTE.red, PALETTE.purple, PALETTE.blue, PALETTE.grey,

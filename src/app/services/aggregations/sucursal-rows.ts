@@ -1,6 +1,7 @@
 import type { SucursalRow } from '@models/data-models.model';
 import { MailEstado, isFlag } from '@models/domain.constants';
 import { classifyCoord } from './coords';
+import { buildRatingIndex, ratingAverage } from './ratings';
 import type { Lookups, RawData } from './lookups';
 
 /**
@@ -11,6 +12,7 @@ import type { Lookups, RawData } from './lookups';
 export function buildSucursalRows(r: RawData, lk: Lookups): SucursalRow[] {
   const distSet = new Set(r.sucDist.map(d => d.SucursalId));
   const socialSet = new Set(r.sucSocial.map(s => s.SucursalId));
+  const ratingBySuc = buildRatingIndex(r.ratings);
 
   const compBySuc = new Map<string, { total: number; abiertas: number }>();
   r.compReqs.forEach(c => {
@@ -32,6 +34,7 @@ export function buildSucursalRows(r: RawData, lk: Lookups): SucursalRow[] {
     const coord = classifyCoord(s.Latitud, s.Longitud);
     const comp = compBySuc.get(s.SucursalId) || { total: 0, abiertas: 0 };
     const mail = mailBySuc.get(s.SucursalId) || { total: 0, fallidos: 0 };
+    const rating = ratingBySuc.get(s.SucursalId) || { sum: 0, count: 0 };
     const isDeleted = isFlag(s.IsDeleted);
     return {
       id: s.SucursalId, nombre: s.NombreSucursal,
@@ -45,6 +48,7 @@ export function buildSucursalRows(r: RawData, lk: Lookups): SucursalRow[] {
       tieneDist: distSet.has(s.SucursalId), tieneSocial: socialSet.has(s.SucursalId),
       compTotal: comp.total, compAbiertas: comp.abiertas, mailsTotal: mail.total, mailsFallidos: mail.fallidos,
       riesgo: comp.abiertas * 2 + mail.fallidos + (isDeleted ? 5 : 0), isDeleted,
+      ratingAverage: ratingAverage(rating.sum, rating.count), ratingCount: rating.count,
     };
   });
 }

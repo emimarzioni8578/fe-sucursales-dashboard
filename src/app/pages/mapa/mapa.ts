@@ -4,19 +4,22 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import * as L from 'leaflet';
 import 'leaflet.heat';
 import 'leaflet.markercluster';
 import { DashboardSource } from '@services/dashboard-source';
 import type { SucursalGeo } from '@models/data-models.model';
+import { RATING_MAX, RATING_MIN } from '@models/domain.constants';
 import { ESTADO_COLOR, ESTADO_COLOR_FALLBACK } from '@shared/chart-theme';
+import { ratingStarsHtml } from '@shared/rating-stars';
 
-type Metric = 'densidad' | 'riesgo' | 'mails';
+type Metric = 'densidad' | 'riesgo' | 'mails' | 'rating';
 
 @Component({
   selector: 'app-mapa',
   standalone: true,
-  imports: [MatCardModule, MatButtonToggleModule, MatSlideToggleModule, MatIconModule],
+  imports: [MatCardModule, MatButtonToggleModule, MatSlideToggleModule, MatIconModule, MatTooltipModule],
   templateUrl: './mapa.html',
   styleUrl: './mapa.scss',
 })
@@ -80,6 +83,10 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
       let w = 0.45;
       if (metric === 'riesgo') w = g.riesgo / maxRiesgo;
       else if (metric === 'mails') w = g.mailsFallidos / maxMails;
+      // Peor calificación = más caliente (mapa de alerta); sin votos no aporta señal (piso).
+      else if (metric === 'rating') {
+        w = g.ratingAverage === null ? 0 : (RATING_MAX - g.ratingAverage) / (RATING_MAX - RATING_MIN);
+      }
       return [g.lat, g.lng, Math.max(0.12, w)];
     });
     this.heatLayer = (L as any).heatLayer(points, { radius: 24, blur: 18, maxZoom: 11 }).addTo(map);
@@ -93,7 +100,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy {
           radius: 5, color, fillColor: color, fillOpacity: 0.85, weight: 1,
         });
         marker.bindPopup(
-          `<b>${g.nombre}</b><br>${g.provincia} &middot; ${g.region}<br>` +
+          `<b>${g.nombre}</b><br>` +
+          `${ratingStarsHtml(g.ratingAverage, g.ratingCount)}<br>` +
+          `${g.provincia} &middot; ${g.region}<br>` +
           `Estado: <b>${g.estado}</b><br>Comp. abiertas: ${g.compAbiertas}<br>` +
           `Mails fallidos: ${g.mailsFallidos}<br>Score riesgo: ${g.riesgo}`,
         );

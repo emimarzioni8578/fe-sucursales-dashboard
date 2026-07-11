@@ -44,5 +44,11 @@ export type MonitoringAccionNombre = (typeof MonitoringAccion)[keyof typeof Moni
 export const FLAG_TRUE = '1';
 export const isFlag = (value: string | undefined | null): boolean => value === FLAG_TRUE;
 
+/** Rango de calificación de sucursales (`sucursal_ratings.Score`), espejo de `SucursalRating` del backend. */
+export const RATING_MIN = 1;
+export const RATING_MAX = 5;
+/** Umbral de rating "bajo": promedio estrictamente menor a esto se considera crítico. */
+export const RATING_BAJO = 3;
+
 /** Bounding box aproximado de Argentina continental para validar coordenadas. */
 export const AR_BOUNDS = { latMin: -55.1, latMax: -21.7, lngMin: -73.6, lngMax: -53.6 } as const;

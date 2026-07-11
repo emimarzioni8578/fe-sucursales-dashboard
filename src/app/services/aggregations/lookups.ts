@@ -1,6 +1,6 @@
 import type {
   Sucursal, Provincia, Localidad, Distribuidor, SucursalDistribuidor,
-  SucursalSocialNetwork, EstadoSucursal, CompensationRequest, CompensationRequestState,
+  SucursalSocialNetwork, SucursalRating, EstadoSucursal, CompensationRequest, CompensationRequestState,
   CompensationRequestError, Error as ErrorRow, Mail, MailState, Monitoring, MonitoringAction,
 } from '@models/data-models.model';
 
@@ -12,6 +12,7 @@ export interface RawData {
   distribuidores: Distribuidor[];
   sucDist: SucursalDistribuidor[];
   sucSocial: SucursalSocialNetwork[];
+  ratings: SucursalRating[];
   estados: EstadoSucursal[];
   compReqs: CompensationRequest[];
   compStates: CompensationRequestState[];
