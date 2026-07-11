@@ -1,6 +1,67 @@
 import { of } from 'rxjs';
 import type { DashboardSource } from '@services/dashboard-source';
-import type { DashboardData, SucursalRow, ProvinciaData } from '@models/data-models.model';
+import type { DashboardData, SucursalRow, ProvinciaData, Sucursal } from '@models/data-models.model';
+import type { RawData } from '@services/aggregations';
+
+/** Sucursal cruda (fila CSV) con defaults válidos: activa, en P1/L1, con coordenadas de CABA. */
+export function makeRawSucursal(partial: Partial<Sucursal> = {}): Sucursal {
+  return {
+    SucursalId: 'S1', NombreSucursal: 'Sucursal Uno', Direccion: 'Calle 1',
+    LocalidadId: 'L1', ProvinciaId: 'P1', CodigoPostal: '1000',
+    EstadoSucursalId: '1', Email: 'uno@e.com', Telefono: '111',
+    FechaApertura: '2024-01-10', Latitud: '-34.6', Longitud: '-58.4',
+    CreatedAt: '2024-01-10', UpdatedAt: '2024-02-01', IsDeleted: '0',
+    ...partial,
+  };
+}
+
+/**
+ * Universo crudo mínimo con los catálogos canónicos ya poblados (estados, provincias,
+ * localidades, estados de comp/mail, acciones de auditoría) y las tablas de hechos vacías.
+ * Cada test agrega solo las filas que le importan.
+ */
+export function makeRawData(partial: Partial<RawData> = {}): RawData {
+  return {
+    sucursales: [],
+    provincias: [
+      { ProvinciaId: 'P1', NombreProvincia: 'Buenos Aires', Region: 'Pampeana' },
+      { ProvinciaId: 'P2', NombreProvincia: 'Cordoba', Region: 'Centro' },
+    ],
+    localidades: [
+      { LocalidadId: 'L1', ProvinciaId: 'P1', NombreLocalidad: 'Ciudad A' },
+      { LocalidadId: 'L2', ProvinciaId: 'P2', NombreLocalidad: 'Ciudad B' },
+    ],
+    distribuidores: [],
+    sucDist: [],
+    sucSocial: [],
+    ratings: [],
+    estados: [
+      { EstadoSucursalId: '1', NombreEstadoSucursal: 'Activa' },
+      { EstadoSucursalId: '2', NombreEstadoSucursal: 'Inactiva' },
+      { EstadoSucursalId: '3', NombreEstadoSucursal: 'Pendiente' },
+    ],
+    compReqs: [],
+    compStates: [
+      { CompensationRequestStateId: '1', NombreEstadoCompensacion: 'Pending' },
+      { CompensationRequestStateId: '2', NombreEstadoCompensacion: 'InReview' },
+      { CompensationRequestStateId: '3', NombreEstadoCompensacion: 'Approved' },
+      { CompensationRequestStateId: '4', NombreEstadoCompensacion: 'Rejected' },
+    ],
+    compErrors: [],
+    errors: [{ ErrorId: 'E1', ErrorName: 'Timeout' }],
+    mails: [],
+    mailStates: [
+      { MailStateId: '1', NombreEstadoMail: 'Sent' },
+      { MailStateId: '2', NombreEstadoMail: 'Failed' },
+    ],
+    monitoring: [],
+    monActions: [
+      { MonitoringActionId: '1', NombreAccion: 'Insert' },
+      { MonitoringActionId: '2', NombreAccion: 'Update' },
+    ],
+    ...partial,
+  };
+}
 
 export function makeSucursalRow(partial: Partial<SucursalRow> = {}): SucursalRow {
   return {

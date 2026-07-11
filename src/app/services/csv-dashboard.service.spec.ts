@@ -135,6 +135,40 @@ describe('CsvDashboardService', () => {
     expect(st?.error).toContain('404');
   });
 
+  it('describes non-404 failures with status and file name', () => {
+    let st: DashboardState | undefined;
+    service.state$.subscribe(s => (st = s));
+    const fx = fixtures();
+    for (const f of FILES.filter(x => x !== 'mails')) {
+      http.expectOne(`assets/data/${f}.csv`).flush(fx[f]);
+    }
+    http.expectOne('assets/data/mails.csv').flush('boom', { status: 500, statusText: 'Server Error' });
+    expect(st?.status).toBe('error');
+    expect(st?.error).toContain('Error 500');
+    expect(st?.error).toContain('mails.csv');
+  });
+
+  it('serves filter options: sorted provincias with id, unique sorted regiones and estados', () => {
+    load();
+    let options: { provincias: { id: string; nombre: string }[]; regiones: string[]; estados: string[] } | undefined;
+    service.filterOptions$.subscribe(o => (options = o));
+    expect(options?.provincias).toEqual([
+      { id: 'P1', nombre: 'Buenos Aires' },
+      { id: 'P2', nombre: 'Cordoba' },
+    ]);
+    expect(options?.regiones).toEqual(['Centro', 'Pampeana']);
+    expect(options?.estados).toEqual(['Activa', 'Inactiva', 'Pendiente']);
+  });
+
+  it('reload() re-fetches every CSV and recomputes', () => {
+    const d = load();
+    expect(d.current.totalSucursales).toBe(5);
+    service.reload();
+    flushAll(http);
+    expect(d.current.totalSucursales).toBe(5);
+    http.verify();
+  });
+
   it('computes branch totals and state breakdown', () => {
     const d = load();
     expect(d.current.totalSucursales).toBe(5);

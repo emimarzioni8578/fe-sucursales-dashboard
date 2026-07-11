@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { MatDialog } from '@angular/material/dialog';
 import { BaseChartDirective } from 'ng2-charts';
 import { CalificacionesComponent } from './calificaciones';
 import { DashboardSource } from '@services/dashboard-source';
@@ -24,11 +25,17 @@ const data = makeDashboardData({
 describe('CalificacionesComponent', () => {
   let fixture: ComponentFixture<CalificacionesComponent>;
   let cmp: CalificacionesComponent;
+  const dialog = { open: vi.fn() };
 
   beforeEach(async () => {
+    dialog.open.mockClear();
     await TestBed.configureTestingModule({
       imports: [CalificacionesComponent],
-      providers: [provideNoopAnimations(), { provide: DashboardSource, useValue: createMockDataService(data) }],
+      providers: [
+        provideNoopAnimations(),
+        { provide: DashboardSource, useValue: createMockDataService(data) },
+        { provide: MatDialog, useValue: dialog },
+      ],
     })
       .overrideComponent(CalificacionesComponent, {
         remove: { imports: [BaseChartDirective] },
@@ -73,6 +80,26 @@ describe('CalificacionesComponent', () => {
     expect(cmp.deltaRed(data.provincias[0])).toBe(0.2);  // 4.1 - 3.9
     expect(cmp.deltaRed(data.provincias[1])).toBe(-0.7); // 3.2 - 3.9
     expect(cmp.deltaRed(data.provincias[2])).toBeNull(); // sin votos
+  });
+
+  it('sorts null-rating provinces to the bottom, not as 0-star averages', () => {
+    const acc = cmp.dataSource.sortingDataAccessor;
+    expect(acc(data.provincias[0], 'ratingAverage')).toBe(4.1);
+    expect(acc(data.provincias[2], 'ratingAverage')).toBe(-1);      // Salta sin votos
+    expect(acc(data.provincias[0], 'delta')).toBe(0.2);
+    expect(acc(data.provincias[2], 'delta')).toBe(-Infinity);
+    expect(acc(data.provincias[0], 'nombre')).toBe('Buenos Aires'); // passthrough
+  });
+
+  it('openDetail opens the sucursal dialog with the row as data', () => {
+    const row = makeSucursalRow({ id: 'Z1' });
+    cmp.openDetail(row);
+    expect(dialog.open).toHaveBeenCalledTimes(1);
+    expect(dialog.open.mock.calls[0][1].data).toBe(row);
+  });
+
+  it('exports the provincia table without throwing', () => {
+    expect(() => cmp.exportar()).not.toThrow();
   });
 
   it('renders the ranking lists and the provincia table', () => {

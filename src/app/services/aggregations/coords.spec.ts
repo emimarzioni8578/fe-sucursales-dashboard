@@ -26,6 +26,17 @@ describe('classifyCoord', () => {
     expect(c.hasCoord).toBe(false);
     expect(c.sinCoord).toBe(true);
   });
+
+  it('is invalid when only one axis falls outside the bounding box', () => {
+    expect(classifyCoord('-34.6', '10').coordInvalida).toBe(true);  // lng fuera
+    expect(classifyCoord('10', '-58.4').coordInvalida).toBe(true);  // lat fuera
+  });
+
+  it('a single missing axis means no usable coordinate', () => {
+    const c = classifyCoord('-34.6', '');
+    expect(c.sinCoord).toBe(true);
+    expect(c.lat).toBeNull();
+  });
 });
 
 describe('hasCoordText', () => {
